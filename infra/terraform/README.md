@@ -10,6 +10,9 @@ site, plus the Cloudflare zone SSL settings GitHub Pages needs.
 - Zone SSL mode set to `full` (not "full (strict)" — GitHub Pages' cert
   isn't issued by a CA Cloudflare can strictly validate against), with
   HTTPS enforced
+- A WAF custom rule (`geo-block.tf`) that hard-blocks all traffic from
+  outside India — intentional given the site's audience, but it also blocks
+  diaspora/NRI family members browsing from abroad, so don't be surprised
 
 ## One-time setup
 
