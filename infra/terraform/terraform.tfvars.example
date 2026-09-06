@@ -1,7 +1,13 @@
 # Copy to terraform.tfvars and fill in — terraform.tfvars is gitignored.
-# Do NOT put cloudflare_api_token here; pass it as TF_VAR_cloudflare_api_token
-# or a CI secret instead.
+# Do NOT put cloudflare_api_token or turnstile_secret_key here; pass them as
+# TF_VAR_cloudflare_api_token / TF_VAR_turnstile_secret_key or CI secrets
+# instead.
 
-cloudflare_zone_id  = "REPLACE_WITH_ZONE_ID"
-domain              = "kayasthaparivar.com"
-github_pages_target = "kayasthaparivar.github.io"
+cloudflare_zone_id    = "REPLACE_WITH_ZONE_ID"
+cloudflare_account_id = "REPLACE_WITH_ACCOUNT_ID"
+domain                = "kayasthaparivar.com"
+github_pages_target   = "kayasthaparivar.github.io"
+
+# Turnstile widget site key (public). Create the widget first — see the
+# "Turnstile site gate — manual one-time setup" section in README.md.
+turnstile_site_key = "REPLACE_WITH_TURNSTILE_SITE_KEY"
