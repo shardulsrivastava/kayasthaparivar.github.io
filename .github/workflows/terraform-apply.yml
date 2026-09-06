@@ -1,0 +1,38 @@
+name: Terraform apply (Cloudflare infra)
+
+# Deliberately manual only — this changes live DNS for kayasthaparivar.com.
+# Trigger from the Actions tab once you've reviewed a plan. Consider adding
+# required reviewers to the "cloudflare-infra" environment below (repo
+# Settings -> Environments) so applies need a second pair of eyes.
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    working-directory: infra/terraform
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    environment: cloudflare-infra
+    env:
+      TF_VAR_cloudflare_api_token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      TF_VAR_cloudflare_zone_id: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+      TF_TOKEN_app_terraform_io: ${{ secrets.TF_API_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+
+      - name: Terraform init
+        run: terraform init -input=false
+
+      - name: Terraform apply
+        run: terraform apply -input=false -auto-approve

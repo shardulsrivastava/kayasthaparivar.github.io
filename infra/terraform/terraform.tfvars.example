@@ -1,0 +1,7 @@
+# Copy to terraform.tfvars and fill in — terraform.tfvars is gitignored.
+# Do NOT put cloudflare_api_token here; pass it as TF_VAR_cloudflare_api_token
+# or a CI secret instead.
+
+cloudflare_zone_id  = "REPLACE_WITH_ZONE_ID"
+domain              = "kayasthaparivar.com"
+github_pages_target = "kayasthaparivar.github.io"
