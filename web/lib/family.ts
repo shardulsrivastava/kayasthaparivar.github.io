@@ -89,6 +89,19 @@ export function getPersonById(id: string): EnrichedPerson | undefined {
   return graph.get(id);
 }
 
+export function getTreeRoots(): EnrichedPerson[] {
+  // A "root" is a blood-line founder: no recorded parents, and not merely
+  // someone who married into the family (those are attached as a spouse
+  // of their partner instead of appearing as their own top-level tree).
+  const spouseIds = new Set<string>();
+  for (const person of graph.values()) {
+    for (const spouseId of person.spouses) spouseIds.add(spouseId);
+  }
+  return [...graph.values()]
+    .filter((p) => p.parents.length === 0 && !spouseIds.has(p.id))
+    .sort((a, b) => (a.birthYear ?? 0) - (b.birthYear ?? 0));
+}
+
 export function getGenerations(): EnrichedPerson[][] {
   const maxGen = Math.max(...[...graph.values()].map((p) => p.generation));
   const generations: EnrichedPerson[][] = Array.from(

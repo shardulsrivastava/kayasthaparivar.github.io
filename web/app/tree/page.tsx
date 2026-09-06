@@ -15,8 +15,8 @@ export default function TreePage() {
             The Family Tree
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Scroll horizontally to explore. Click on anyone to see their
-            story.
+            Click a card to reveal their children. Use the ↗ icon to open a
+            profile.
           </p>
         </div>
         <FamilyTree />
