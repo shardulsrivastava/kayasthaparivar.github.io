@@ -3,16 +3,20 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "predev": "npm run generate-data",
     "dev": "next dev",
+    "prebuild": "npm run generate-data",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "generate-data": "node scripts/build-family-data.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",
     "class-variance-authority": "^0.7.1",
     "cmdk": "^1.1.1",
     "cn": "^0.2.5",
+    "js-yaml": "^5.4.1",
     "lucide-react": "^1.41.0",
     "next": "16.3.4",
     "react": "19.2.8",
@@ -22,6 +26,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/js-yaml": "^4.0.9",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

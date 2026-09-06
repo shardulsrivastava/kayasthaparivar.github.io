@@ -1,4 +1,4 @@
-import familyData from "@/data/family.json";
+import familyData from "@/data/family.generated.json";
 
 export interface Person {
   id: string;
