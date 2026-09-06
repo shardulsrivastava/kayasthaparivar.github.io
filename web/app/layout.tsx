@@ -22,6 +22,10 @@ export const metadata: Metadata = {
   title: "Kayastha Parivar | Family Tree",
   description:
     "An interactive family tree of the Kayastha Parivar of Barabanki — explore generations, relationships, and stories.",
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
