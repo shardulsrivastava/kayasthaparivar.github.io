@@ -260,6 +260,19 @@
       "photo": "/photos/placeholder-female.svg",
       "parents": ["p13", "p14"],
       "spouses": []
+    },
+    {
+      "id": "p21",
+      "name": "Dummy Test Srivastava",
+      "gender": "male",
+      "birthYear": 2000,
+      "deathYear": null,
+      "location": "Test City",
+      "occupation": "",
+      "bio": "Dummy entry added to trigger and verify a fresh deploy after switching the Pages source to GitHub Actions. Safe to delete.",
+      "photo": "/photos/placeholder-male.svg",
+      "parents": [],
+      "spouses": []
     }
   ]
 }
