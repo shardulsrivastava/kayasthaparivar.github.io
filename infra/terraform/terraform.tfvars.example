@@ -1,7 +1,7 @@
 # Copy to terraform.tfvars and fill in — terraform.tfvars is gitignored.
-# Do NOT put cloudflare_api_token or turnstile_secret_key here; pass them as
-# TF_VAR_cloudflare_api_token / TF_VAR_turnstile_secret_key or CI secrets
-# instead.
+# Do NOT put cloudflare_api_token, turnstile_secret_key, or session_secret
+# here; pass them as TF_VAR_cloudflare_api_token / TF_VAR_turnstile_secret_key
+# / TF_VAR_session_secret or CI secrets instead.
 
 cloudflare_zone_id    = "REPLACE_WITH_ZONE_ID"
 cloudflare_account_id = "REPLACE_WITH_ACCOUNT_ID"

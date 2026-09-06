@@ -34,10 +34,17 @@ resource "cloudflare_record" "worker_origin" {
   ttl     = 300
 }
 
-# The Worker script itself. Bindings supply the Turnstile keys at runtime —
-# the site key is public (embedded in the challenge page HTML anyway) so a
-# plain_text_binding is fine; the secret key uses secret_text_binding, which
-# the provider treats as sensitive and never prints in plan/apply output.
+# The Worker script itself. Bindings supply the Turnstile keys and the
+# session-signing secret at runtime — the site key is public (embedded in
+# the challenge page HTML anyway) so a plain_text_binding is fine; the two
+# secrets use secret_text_binding, which the provider treats as sensitive
+# and never prints in plan/apply output.
+#
+# SESSION_SECRET is deliberately separate from TURNSTILE_SECRET_KEY: it
+# signs the post-challenge session cookie (see hasValidSessionCookie() /
+# signValue() in turnstile-gate.js) rather than talking to Cloudflare's
+# siteverify API. Keeping them distinct means rotating one doesn't affect
+# the other, and a leak of one key doesn't compromise the other's purpose.
 resource "cloudflare_workers_script" "turnstile_gate" {
   account_id = var.cloudflare_account_id
   name       = "turnstile-site-gate"
@@ -52,6 +59,11 @@ resource "cloudflare_workers_script" "turnstile_gate" {
   secret_text_binding {
     name = "TURNSTILE_SECRET_KEY"
     text = var.turnstile_secret_key
+  }
+
+  secret_text_binding {
+    name = "SESSION_SECRET"
+    text = var.session_secret
   }
 }
 

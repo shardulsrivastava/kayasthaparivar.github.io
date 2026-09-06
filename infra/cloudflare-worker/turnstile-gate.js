@@ -6,14 +6,21 @@
  * front of the zone (bound to a route covering the whole domain) and does
  * the actual gating:
  *
- *   - No valid signed-looking session cookie?  Serve an interstitial page
- *     with a Cloudflare Turnstile widget instead of the real site.
+ *   - No valid signed session cookie?  Serve an interstitial page with a
+ *     Cloudflare Turnstile widget instead of the real site.
  *   - Widget solved?  The form POSTs here, we verify the token server-side
  *     against Cloudflare's siteverify API (this is the part a client-JS-only
  *     gate can't do — the secret key never reaches the browser), then set
  *     a cookie and redirect back to the page the visitor actually wanted.
  *   - Valid cookie present?  Pass the request straight through to the real
  *     GitHub Pages origin.
+ *
+ * The cookie is HMAC-signed (see the SESSION_SECRET binding and signValue()
+ * below) rather than a static marker value. This repo is public, so the
+ * cookie *name* is not a secret — if the value were just a fixed string like
+ * "1", anyone reading this file could set that cookie by hand and skip the
+ * challenge forever. Signing it with a server-only secret means a valid
+ * cookie can only come from this Worker after a real siteverify success.
  *
  * ---------------------------------------------------------------------
  * Why `resolveOverride` alone is not enough, and what we do instead:
@@ -53,6 +60,16 @@ const VERIFY_PATH = "/__turnstile-verify";
 const TURNSTILE_SITEVERIFY_URL =
   "https://challenges.cloudflare.com/turnstile/v0/siteverify";
 
+// The cookie value is `<issuedAtSeconds>.<hex-hmac-sha256>`, signed with
+// SESSION_SECRET. This is NOT optional decoration: this Worker's source is
+// in a public repo, so anyone can read COOKIE_NAME and see that a naive
+// "cookie present == verified" check would let them just send
+// `Cookie: cf_turnstile_verified=1` forever and skip Turnstile entirely. The
+// HMAC means a valid cookie value can only be produced by someone who knows
+// SESSION_SECRET (i.e. this Worker, after a real siteverify success) — the
+// timestamp is part of the signed payload so a captured cookie can't be
+// replayed past COOKIE_MAX_AGE_SECONDS either.
+
 // In-zone DNS record created by infra/terraform/turnstile.tf specifically so
 // resolveOverride has a same-zone target that ultimately points at the real
 // GitHub Pages origin. See the file-level comment above for why this exists.
@@ -66,7 +83,7 @@ export default {
       return handleVerify(request, env, url);
     }
 
-    if (hasValidSessionCookie(request)) {
+    if (await hasValidSessionCookie(request, env)) {
       return proxyToOrigin(request);
     }
 
@@ -86,10 +103,9 @@ function proxyToOrigin(request) {
   });
 }
 
-/** Very small check: cookie must be present and equal to the expected marker. */
-function hasValidSessionCookie(request) {
+function parseCookies(request) {
   const cookieHeader = request.headers.get("Cookie") || "";
-  const cookies = Object.fromEntries(
+  return Object.fromEntries(
     cookieHeader
       .split(";")
       .map((pair) => pair.trim())
@@ -101,7 +117,69 @@ function hasValidSessionCookie(request) {
           : [pair.slice(0, idx), pair.slice(idx + 1)];
       }),
   );
-  return cookies[COOKIE_NAME] === "1";
+}
+
+/**
+ * Validate the session cookie: it must be `<issuedAt>.<hmac>`, the hmac must
+ * verify against SESSION_SECRET, and issuedAt must be within
+ * COOKIE_MAX_AGE_SECONDS of now. Any failure (missing, malformed, wrong
+ * signature, expired) is treated as "not verified" — same as no cookie.
+ */
+async function hasValidSessionCookie(request, env) {
+  const value = parseCookies(request)[COOKIE_NAME];
+  if (!value) return false;
+
+  const dotIndex = value.indexOf(".");
+  if (dotIndex === -1) return false;
+
+  const issuedAtRaw = value.slice(0, dotIndex);
+  const signature = value.slice(dotIndex + 1);
+  const issuedAt = Number(issuedAtRaw);
+  if (!Number.isFinite(issuedAt)) return false;
+
+  const nowSeconds = Math.floor(Date.now() / 1000);
+  if (nowSeconds - issuedAt > COOKIE_MAX_AGE_SECONDS) return false;
+  if (issuedAt > nowSeconds + 60) return false; // reject clock-skew-implausible future timestamps
+
+  const expectedSignature = await signValue(issuedAtRaw, env.SESSION_SECRET);
+  return timingSafeEqual(signature, expectedSignature);
+}
+
+/** Build a fresh, signed cookie value stamped with the current time. */
+async function createSessionCookieValue(env) {
+  const issuedAtRaw = String(Math.floor(Date.now() / 1000));
+  const signature = await signValue(issuedAtRaw, env.SESSION_SECRET);
+  return `${issuedAtRaw}.${signature}`;
+}
+
+/** HMAC-SHA256(secret, value), hex-encoded, via Web Crypto (available in Workers). */
+async function signValue(value, secret) {
+  const key = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(secret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"],
+  );
+  const signatureBuffer = await crypto.subtle.sign(
+    "HMAC",
+    key,
+    new TextEncoder().encode(value),
+  );
+  return [...new Uint8Array(signatureBuffer)]
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+/** Constant-time string comparison to avoid leaking signature bytes via timing. */
+function timingSafeEqual(a, b) {
+  if (typeof a !== "string" || typeof b !== "string") return false;
+  if (a.length !== b.length) return false;
+  let mismatch = 0;
+  for (let i = 0; i < a.length; i++) {
+    mismatch |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return mismatch === 0;
 }
 
 async function handleVerify(request, env, url) {
@@ -142,11 +220,13 @@ async function handleVerify(request, env, url) {
     });
   }
 
+  const cookieValue = await createSessionCookieValue(env);
+
   const headers = new Headers();
   headers.set("Location", redirectTo);
   headers.append(
     "Set-Cookie",
-    `${COOKIE_NAME}=1; Path=/; Max-Age=${COOKIE_MAX_AGE_SECONDS}; HttpOnly; Secure; SameSite=Lax`,
+    `${COOKIE_NAME}=${cookieValue}; Path=/; Max-Age=${COOKIE_MAX_AGE_SECONDS}; HttpOnly; Secure; SameSite=Lax`,
   );
 
   return new Response(null, { status: 302, headers });

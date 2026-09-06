@@ -36,3 +36,9 @@ variable "turnstile_secret_key" {
   type        = string
   sensitive   = true
 }
+
+variable "session_secret" {
+  description = "Random secret used inside the Worker to HMAC-sign the post-Turnstile session cookie. This repo (and the Worker script) is public, so the cookie's name and format are not secret — this key is what makes a cookie value unforgeable without it. Never commit this — set via TF_VAR_session_secret or a CI secret. Generate with e.g. `openssl rand -hex 32`; no default is provided on purpose."
+  type        = string
+  sensitive   = true
+}

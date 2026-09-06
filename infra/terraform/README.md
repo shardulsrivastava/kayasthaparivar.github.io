@@ -56,22 +56,41 @@ automated. Before running `apply` with `turnstile.tf` included:
    - Domain: `kayasthaparivar.com` (add `www.kayasthaparivar.com` too if
      the dashboard asks for it separately).
 2. Copy the **Site Key** and **Secret Key** it gives you.
-3. Set both as Terraform variables — never commit the secret key:
+3. Generate a random session-signing secret (this is separate from the
+   Turnstile keys — see "Why a signed cookie" below):
+   ```sh
+   openssl rand -hex 32
+   ```
+4. Set all three as Terraform variables — never commit any of them:
    ```sh
    export TF_VAR_turnstile_site_key="0x4AAAAAAA..."
    export TF_VAR_turnstile_secret_key="0x4AAAAAAA..."
+   export TF_VAR_session_secret="<output of the openssl command above>"
    ```
    (or add them as `TF_VAR_turnstile_site_key` / `TF_VAR_turnstile_secret_key`
-   CI secrets, same as `cloudflare_api_token`).
-4. Run `terraform plan` / `terraform apply` as usual.
+   / `TF_VAR_session_secret` CI secrets, same as `cloudflare_api_token`).
+5. Run `terraform plan` / `terraform apply` as usual.
 
 Once applied, every request to the domain is gated by the Worker until it
-sees the `cf_turnstile_verified` cookie, which is only set after the Worker
-verifies the Turnstile response server-side against Cloudflare's siteverify
-API — see the comment block at the top of
+sees a valid `cf_turnstile_verified` cookie, which is only set after the
+Worker verifies the Turnstile response server-side against Cloudflare's
+siteverify API — see the comment block at the top of
 `infra/cloudflare-worker/turnstile-gate.js` for how it avoids the
 Worker-fetches-itself infinite loop that a naive origin pass-through would
 hit.
+
+### Why a signed cookie
+
+This repo (including the Worker source) is public. The cookie is not just a
+static marker like `cf_turnstile_verified=1` — anyone could read that value
+in this file and set it by hand in their browser or a script, skipping
+Turnstile forever. Instead the cookie value is
+`<unix-timestamp>.<hmac-sha256>`, signed with the `SESSION_SECRET` binding
+(`var.session_secret` in Terraform). A visitor can only get a valid cookie
+by actually passing a Turnstile challenge, since only the Worker (which
+holds the secret) can produce a signature that verifies — and the
+timestamp is part of what's signed, so a copied cookie stops working once
+`COOKIE_MAX_AGE_SECONDS` elapses, same as before.
 
 **This cannot be end-to-end tested without a real deploy** (no sandbox
 Cloudflare account/API access was available while building this). Terraform
