@@ -170,7 +170,7 @@ roots:
                         children:
                           - name: अनिल कुमार
                             gender: male
-                            bio: Parent link uncertain in the scanned register (crossing lines) — please verify against the original.
+                            bio: 'गुरु प्रसाद/हरी प्रसाद/गुरु सहाय/प्रताप नरायन इसी संतान-पंक्ति में हैं; मूल चार्ट में इनका जोड़-रेखा बायें अनिल कुमार और दायें आशुतोष कुमार दोनों को छूता है — माता-पिता अनिल बनाम आशुतोष अभी असंदिग्ध नहीं।'
                             children:
                               - name: गुरु प्रसाद
                                 gender: male
@@ -221,8 +221,12 @@ roots:
             children:
               - name: सूरजबली
                 gender: male
+              - name: गनेश
+                gender: male
                 children:
                   - name: बच्चू लाल
+                    gender: male
+                  - name: मोहन लाल
                     gender: male
                     children:
                       - name: भगौती दयाल
@@ -255,7 +259,6 @@ roots:
                                         gender: male
                                       - name: मनोज कुमार
                                         gender: male
-                                        bio: Parent link uncertain in the scanned register (crossing lines) — please verify against the original.
                                         children:
                                           - name: शिवराम बहादुर
                                             gender: male
@@ -292,10 +295,6 @@ roots:
                                                 gender: female
                                               - name: उमा
                                                 gender: female
-                  - name: मोहन लाल
-                    gender: male
-                    bio: Parent link uncertain in the scanned register (crossing lines) — please verify against the original.
-                    children:
                       - name: राधेश्याम
                         gender: male
                       - name: धनश्याम
@@ -304,22 +303,21 @@ roots:
                         gender: male
                       - name: रामनेरश
                         gender: male
-              - name: गनेश
-                gender: male
-                children:
-                  - name: लालता प्रसाद
-                    gender: male
-                  - name: चन्द्रिका प्रसाद
-                    gender: male
-                    bio: Parent link uncertain in the scanned register (crossing lines) — please verify against the original.
-                    children:
-                      - name: राम कृष्ण
-                        gender: male
-                      - name: राम बख्श
-                        gender: male
       - name: फुर्सतराय
         gender: male
         children:
+          - name: मेवालाल
+            gender: male
+            children:
+              - name: लालता प्रसाद
+                gender: male
+              - name: चन्द्रिका प्रसाद
+                gender: male
+                children:
+                  - name: राम कृष्ण
+                    gender: male
+                  - name: राम बख्श
+                    gender: male
           - name: मातादीन (मतुआ लाला)
             gender: male
             children:
