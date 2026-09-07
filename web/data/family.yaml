@@ -446,12 +446,6 @@ roots:
                   - name: कमलपति
                     gender: female
                     bio: लखनऊ में ब्याही गई।
-          - name: बालगोविन्द (दादा)
-            gender: male
-            children:
-              - name: संगम लाल (जिलेदार)
-                gender: male
-                children:
                   - name: जंग बहादुर
                     gender: male
                     children:
@@ -497,6 +491,11 @@ roots:
                         children:
                           - name: स्वास्तिक
                             gender: male
+          - name: बालगोविन्द (दादा)
+            gender: male
+            children:
+              - name: संगम लाल (जिलेदार)
+                gender: male
               - name: महाराजबख्श
                 gender: male
                 children:

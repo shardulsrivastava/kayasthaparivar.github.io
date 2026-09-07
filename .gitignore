@@ -10,3 +10,6 @@ infra/terraform/override.tf.json
 
 # OS
 .DS_Store
+
+# Claude Directories
+.claude
