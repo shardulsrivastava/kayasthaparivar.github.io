@@ -313,6 +313,17 @@ function renderChallengePage({ redirectTo, siteKey, error }) {
     color: #6b7590;
   }
   noscript { color: #f3a5a5; font-size: 0.85rem; }
+  button[type="submit"] {
+    appearance: none;
+    border: 1px solid rgba(111, 215, 232, 0.4);
+    background: rgba(111, 215, 232, 0.12);
+    color: #e7ecfa;
+    border-radius: 8px;
+    padding: 8px 20px;
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+  button[type="submit"]:hover { background: rgba(111, 215, 232, 0.2); }
 </style>
 </head>
 <body>
@@ -321,14 +332,29 @@ function renderChallengePage({ redirectTo, siteKey, error }) {
       <h1>Just a quick check</h1>
       <p>We ask every visitor to confirm they're human once. This keeps automated scraping off the family tree — it takes a second.</p>
       ${error ? `<div class="error">${escapeHtml(error)}</div>` : ""}
-      <form method="POST" action="${VERIFY_PATH}">
+      <form method="POST" action="${VERIFY_PATH}" id="turnstile-form">
         <input type="hidden" name="redirect_to" value="${escapedRedirect}" />
-        <div class="cf-turnstile" data-sitekey="${escapedSiteKey}" data-theme="dark"></div>
+        <div
+          class="cf-turnstile"
+          data-sitekey="${escapedSiteKey}"
+          data-theme="dark"
+          data-callback="onTurnstileSuccess"
+        ></div>
+        <button type="submit">Continue</button>
         <noscript>Please enable JavaScript to complete this check.</noscript>
       </form>
       <div class="footer">Kayastha Parivar &middot; kayasthaparivar.com</div>
     </div>
   </div>
+  <script>
+    // Turnstile calls this once the widget succeeds. The visible "Continue"
+    // button above is a fallback (e.g. if this callback is slow to fire) —
+    // without either one, there was previously no way to actually submit
+    // the form after solving the widget, so the page just sat there.
+    function onTurnstileSuccess() {
+      document.getElementById("turnstile-form").submit();
+    }
+  </script>
 </body>
 </html>`;
 
