@@ -2,6 +2,10 @@
   "name": "web",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "npm@10.9.9",
+  "engines": {
+    "npm": "10.9.9"
+  },
   "scripts": {
     "predev": "npm run generate-data",
     "dev": "next dev",
