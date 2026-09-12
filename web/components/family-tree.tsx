@@ -288,7 +288,14 @@ export function FamilyTree() {
       >
         <svg className="pointer-events-none absolute inset-0 h-full w-full overflow-visible">
           <defs>
-            <linearGradient id="tree-line" x1="0" y1="0" x2="0" y2="1">
+            <linearGradient
+              id="tree-line"
+              gradientUnits="userSpaceOnUse"
+              x1="0"
+              y1="0"
+              x2="0"
+              y2="100%"
+            >
               <stop offset="0%" stopColor="#22d3ee" stopOpacity="0.7" />
               <stop offset="100%" stopColor="#c084fc" stopOpacity="0.7" />
             </linearGradient>
