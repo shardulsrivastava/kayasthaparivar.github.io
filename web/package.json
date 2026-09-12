@@ -8,12 +8,13 @@
   },
   "scripts": {
     "predev": "npm run generate-data",
-    "dev": "next dev",
+    "dev": "concurrently -k -n next,data \"next dev\" \"npm:watch-data\"",
     "prebuild": "npm run generate-data",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "generate-data": "node scripts/build-family-data.mjs"
+    "generate-data": "node scripts/build-family-data.mjs",
+    "watch-data": "node --watch --watch-path=data/family.yaml scripts/build-family-data.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",
@@ -34,6 +35,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "concurrently": "^10.0.5",
     "eslint": "^9",
     "eslint-config-next": "16.3.4",
     "tailwindcss": "^4",
