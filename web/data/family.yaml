@@ -68,6 +68,10 @@ roots:
                                 gender: male
                               - name: शिवम
                                 gender: male
+
+              - name: बाल किशुन
+                gender: male
+                children:
                   - name: बरसाती लाल
                     gender: male
                     children:
@@ -85,8 +89,7 @@ roots:
                       - name: सुमन
                         gender: female
                         bio: पुत्री
-              - name: बाल किशुन
-                gender: male
+
       - name: शिव गोपाल
         gender: male
         children:
