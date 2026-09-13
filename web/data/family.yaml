@@ -58,9 +58,6 @@ roots:
                             children:
                               - name: शोभित
                                 gender: male
-                      - name: आनन्द बिहारी
-                        gender: male
-                        children:
                           - name: आशीष कुमार
                             gender: male
                             children:
@@ -68,6 +65,8 @@ roots:
                                 gender: male
                               - name: शिवम
                                 gender: male
+                      - name: आनन्द बिहारी
+                        gender: male
 
               - name: बाल किशुन
                 gender: male
@@ -174,41 +173,6 @@ roots:
                           - name: अनिल कुमार
                             gender: male
                             bio: 'गुरु प्रसाद/हरी प्रसाद/गुरु सहाय/प्रताप नरायन इसी संतान-पंक्ति में हैं; मूल चार्ट में इनका जोड़-रेखा बायें अनिल कुमार और दायें आशुतोष कुमार दोनों को छूता है — माता-पिता अनिल बनाम आशुतोष अभी असंदिग्ध नहीं।'
-                            children:
-                              - name: गुरु प्रसाद
-                                gender: male
-                                children:
-                                  - name: श्री राम
-                                    gender: male
-                                    children:
-                                      - name: दिलीप
-                                        gender: male
-                              - name: हरी प्रसाद
-                                gender: male
-                                children:
-                                  - name: राधेलाल
-                                    gender: male
-                                    children:
-                                      - name: राजेश कुमार
-                                        gender: male
-                                      - name: सुनील कुमार
-                                        gender: male
-                              - name: गुरु सहाय
-                                gender: male
-                                children:
-                                  - name: कृष्ण बिहारी (मन्ने लाल)
-                                    gender: male
-                                    children:
-                                      - name: गोपाल
-                                        gender: male
-                                      - name: महेन्द्र
-                                        gender: male
-                                      - name: रामेन्द्र
-                                        gender: male
-                                      - name: राजेश
-                                        gender: male
-                              - name: प्रताप नरायन
-                                gender: male
                           - name: अखिल कुमार
                             gender: male
                           - name: विनय कुमार
@@ -219,6 +183,40 @@ roots:
                             gender: male
               - name: राम लौटन
                 gender: male
+                children:
+                  - name: गुरु प्रसाद
+                    gender: male
+                    children:
+                      - name: श्री राम
+                        gender: male
+                        children:
+                          - name: दिलीप
+                            gender: male
+                      - name: राधेलाल
+                        gender: male
+                        children:
+                          - name: राजेश कुमार
+                            gender: male
+                          - name: सुनील कुमार
+                            gender: male
+                  - name: हरी प्रसाद
+                    gender: male
+                  - name: गुरु सहाय
+                    gender: male
+                  - name: प्रताप नरायन
+                    gender: male
+                    children:
+                      - name: कृष्ण बिहारी (मन्ने लाल)
+                        gender: male
+                        children:
+                          - name: गोपाल
+                            gender: male
+                          - name: महेन्द्र
+                            gender: male
+                          - name: रामेन्द्र
+                            gender: male
+                          - name: राजेश
+                            gender: male
           - name: परागदत्त
             gender: male
             children:
@@ -306,9 +304,6 @@ roots:
                         gender: male
                       - name: रामनेरश
                         gender: male
-      - name: फुर्सतराय
-        gender: male
-        children:
           - name: मेवालाल
             gender: male
             children:
@@ -321,6 +316,9 @@ roots:
                     gender: male
                   - name: राम बख्श
                     gender: male
+      - name: फुर्सतराय
+        gender: male
+        children:
           - name: मातादीन (मतुआ लाला)
             gender: male
             children:
