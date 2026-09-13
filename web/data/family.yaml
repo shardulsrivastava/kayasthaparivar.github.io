@@ -244,6 +244,8 @@ roots:
                                   - name: नरेन्द्र बहादुर
                                     gender: male
                                     children:
+                                      - name: राजेश
+                                        gender: male
                                       - name: राम शंकर
                                         gender: male
                                         children:
