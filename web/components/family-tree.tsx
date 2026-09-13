@@ -129,14 +129,14 @@ function TreeCard({
           {lifespan(person)}
         </p>
       </div>
-      {hasChildren ? (
-        <ChevronDown
-          className={cn(
-            "h-4 w-4 text-muted-foreground transition-transform duration-300",
-            expanded && "rotate-180",
-          )}
-        />
-      ) : null}
+      <ChevronDown
+        aria-hidden="true"
+        className={cn(
+          "h-4 w-4 text-muted-foreground transition-transform duration-300",
+          hasChildren && expanded && "rotate-180",
+          !hasChildren && "invisible pointer-events-none",
+        )}
+      />
     </Card>
   );
 }
