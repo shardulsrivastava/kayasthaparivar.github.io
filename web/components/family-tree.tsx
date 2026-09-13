@@ -270,18 +270,100 @@ export function FamilyTree() {
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
+
+    // Smoothly animate scrollLeft toward a target instead of jumping on
+    // every wheel tick.
+    let target = el.scrollLeft;
+    let raf: number | null = null;
+    function animate() {
+      const current = el!.scrollLeft;
+      const diff = target - current;
+      if (Math.abs(diff) < 0.5) {
+        el!.scrollLeft = target;
+        raf = null;
+        return;
+      }
+      el!.scrollLeft = current + diff * 0.25;
+      raf = requestAnimationFrame(animate);
+    }
+
     function onWheel(e: WheelEvent) {
-      if (!el || el.scrollWidth <= el.clientWidth) return;
-      if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
-      el.scrollLeft += e.deltaY;
+      if (el!.scrollWidth <= el!.clientWidth) return;
+      // Only hijack the wheel for explicit horizontal intent (shift+wheel,
+      // or a trackpad's native horizontal swipe). Plain vertical wheel
+      // input is left alone so it scrolls the page as usual.
+      const trackpadHorizontal = Math.abs(e.deltaX) > Math.abs(e.deltaY);
+      if (!e.shiftKey && !trackpadHorizontal) return;
+      const delta = e.shiftKey
+        ? Math.abs(e.deltaX) > Math.abs(e.deltaY)
+          ? e.deltaX
+          : e.deltaY
+        : e.deltaX;
+      target = Math.max(
+        0,
+        Math.min(el!.scrollWidth - el!.clientWidth, target + delta),
+      );
+      if (raf === null) raf = requestAnimationFrame(animate);
       e.preventDefault();
     }
+
+    // Click-and-drag panning on empty tree background (not on cards/links).
+    let isDragging = false;
+    let dragStartX = 0;
+    let dragStartScrollLeft = 0;
+
+    function onPointerDown(e: PointerEvent) {
+      if (e.button !== 0) return;
+      const targetEl = e.target as HTMLElement;
+      if (targetEl.closest("a, button, [role='button']")) return;
+      isDragging = true;
+      if (raf !== null) {
+        cancelAnimationFrame(raf);
+        raf = null;
+      }
+      dragStartX = e.clientX;
+      dragStartScrollLeft = el!.scrollLeft;
+      el!.style.userSelect = "none";
+      el!.classList.add("cursor-grabbing");
+      el!.setPointerCapture(e.pointerId);
+    }
+
+    function onPointerMove(e: PointerEvent) {
+      if (!isDragging) return;
+      el!.scrollLeft = dragStartScrollLeft - (e.clientX - dragStartX);
+      target = el!.scrollLeft;
+    }
+
+    function endDrag(e: PointerEvent) {
+      if (!isDragging) return;
+      isDragging = false;
+      el!.style.userSelect = "";
+      el!.classList.remove("cursor-grabbing");
+      if (el!.hasPointerCapture(e.pointerId)) {
+        el!.releasePointerCapture(e.pointerId);
+      }
+    }
+
     el.addEventListener("wheel", onWheel, { passive: false });
-    return () => el.removeEventListener("wheel", onWheel);
+    el.addEventListener("pointerdown", onPointerDown);
+    el.addEventListener("pointermove", onPointerMove);
+    el.addEventListener("pointerup", endDrag);
+    el.addEventListener("pointercancel", endDrag);
+    return () => {
+      el.removeEventListener("wheel", onWheel);
+      el.removeEventListener("pointerdown", onPointerDown);
+      el.removeEventListener("pointermove", onPointerMove);
+      el.removeEventListener("pointerup", endDrag);
+      el.removeEventListener("pointercancel", endDrag);
+      if (raf !== null) cancelAnimationFrame(raf);
+    };
   }, []);
 
   return (
-    <div ref={scrollRef} className="w-full overflow-x-auto pb-8">
+    <div
+      ref={scrollRef}
+      className="w-full cursor-grab overflow-x-auto pb-8"
+    >
       <div
         ref={contentRef}
         className="relative inline-flex min-w-full justify-center gap-16 px-8 py-12"
