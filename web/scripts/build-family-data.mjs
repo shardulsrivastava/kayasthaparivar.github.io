@@ -31,6 +31,143 @@ if (!doc || !Array.isArray(doc.roots)) {
   );
 }
 
+// --- Devanagari -> Roman transliteration -----------------------------------
+//
+// Hand-rolled phonetic approximation (not IAST/ITRANS-grade) used only to
+// give search a Roman-alphabet string to fuzzy-match against. No npm
+// dependency for this on purpose — it's a small, fixed character set.
+//
+// Key rule: a Devanagari consonant carries an implicit "a" vowel sound
+// UNLESS it's followed by a dependent vowel sign (matra, which replaces the
+// "a") or a virama/halant (्, which suppresses the vowel entirely, used to
+// build consonant clusters like ख्त in बख्तावर).
+//
+// Long/short vowel pairs (अ/आ, इ/ई, उ/ऊ) are collapsed to the same Roman
+// letter (a, i, u) to match how people casually type Hindi names in
+// English (e.g. "mevalal", not "meevaalaal") — good enough for fuzzy
+// search, not meant to be a precise scholarly transliteration.
+
+// Independent vowels (used when a vowel appears on its own, not attached to
+// a consonant - typically word-initial).
+const INDEPENDENT_VOWELS = {
+  "अ": "a", "आ": "a", "इ": "i", "ई": "i", "उ": "u", "ऊ": "u",
+  "ऋ": "ri", "ए": "e", "ऐ": "ai", "ओ": "o", "औ": "au",
+};
+
+// Dependent vowel signs (matras) that attach to a consonant, replacing its
+// implicit "a".
+const MATRAS = {
+  "ा": "a", "ि": "i", "ी": "i", "ु": "u", "ू": "u",
+  "ृ": "ri", "े": "e", "ै": "ai", "ो": "o", "ौ": "au",
+};
+
+// Consonants, given as their sound WITHOUT the implicit "a" - the caller
+// adds "a" back unless a matra/virama says otherwise.
+const CONSONANTS = {
+  "क": "k", "ख": "kh", "ग": "g", "घ": "gh", "ङ": "ng",
+  "च": "ch", "छ": "chh", "ज": "j", "झ": "jh", "ञ": "ny",
+  "ट": "t", "ठ": "th", "ड": "d", "ढ": "dh", "ण": "n",
+  "त": "t", "थ": "th", "द": "d", "ध": "dh", "न": "n",
+  "प": "p", "फ": "ph", "ब": "b", "भ": "bh", "म": "m",
+  "य": "y", "र": "r", "ल": "l", "व": "v",
+  "श": "sh", "ष": "sh", "स": "s", "ह": "h",
+  "ळ": "l",
+};
+
+// A nukta (़) after a base consonant marks a Perso-Arabic loan sound
+// (mostly present in Urdu-influenced names). Keyed by the base consonant.
+const NUKTA_CONSONANTS = {
+  "क": "q", "ख": "kh", "ग": "gh", "ज": "z",
+  "ड": "r", "ढ": "rh", "फ": "f", "य": "y",
+};
+
+const VIRAMA = "्";
+const NUKTA = "़";
+const ANUSVARA = "ं"; // nasalization, e.g. कं
+const CHANDRABINDU = "ँ"; // nasalization, e.g. हँ
+const VISARGA = "ः"; // trailing aspiration, e.g. दुःख
+
+// Appends whichever trailing nasal/aspiration mark (if any) sits at
+// chars[i], returning the new index.
+function consumeTrailingMark(chars, i, append) {
+  if (chars[i] === ANUSVARA || chars[i] === CHANDRABINDU) {
+    append("n");
+    return i + 1;
+  }
+  if (chars[i] === VISARGA) {
+    append("h");
+    return i + 1;
+  }
+  return i;
+}
+
+function transliterate(text) {
+  const chars = [...text]; // iterate by code point, not UTF-16 unit
+  let out = "";
+  const append = (s) => {
+    out += s;
+  };
+  let i = 0;
+
+  while (i < chars.length) {
+    const ch = chars[i];
+
+    if (CONSONANTS[ch] !== undefined) {
+      let sound = CONSONANTS[ch];
+      i += 1;
+      if (chars[i] === NUKTA && NUKTA_CONSONANTS[ch] !== undefined) {
+        sound = NUKTA_CONSONANTS[ch];
+        i += 1;
+      }
+      out += sound;
+
+      if (chars[i] === VIRAMA) {
+        // Vowel suppressed - this consonant joins a cluster with the next.
+        i += 1;
+      } else if (chars[i] !== undefined && MATRAS[chars[i]] !== undefined) {
+        out += MATRAS[chars[i]];
+        i += 1;
+      } else {
+        out += "a"; // implicit vowel
+      }
+
+      i = consumeTrailingMark(chars, i, append);
+      continue;
+    }
+
+    if (INDEPENDENT_VOWELS[ch] !== undefined) {
+      out += INDEPENDENT_VOWELS[ch];
+      i += 1;
+      i = consumeTrailingMark(chars, i, append);
+      continue;
+    }
+
+    if (ch === ANUSVARA || ch === CHANDRABINDU) {
+      out += "n";
+      i += 1;
+      continue;
+    }
+    if (ch === VISARGA) {
+      out += "h";
+      i += 1;
+      continue;
+    }
+    if (ch === NUKTA || ch === VIRAMA) {
+      // Stray mark with nothing to attach to - drop it.
+      i += 1;
+      continue;
+    }
+
+    // Anything else (spaces, digits, Latin letters, punctuation) passes
+    // through unchanged so word boundaries and annotations like "(दामाद)"
+    // stay intact.
+    out += ch;
+    i += 1;
+  }
+
+  return out.toLowerCase();
+}
+
 let nextId = 1;
 function allocateId() {
   return `p${nextId++}`;
@@ -58,6 +195,7 @@ function makePerson(node, parentIds) {
   const person = {
     id,
     name: node.name,
+    nameRoman: transliterate(node.name),
     gender: node.gender,
     birthYear: null,
     deathYear: null,

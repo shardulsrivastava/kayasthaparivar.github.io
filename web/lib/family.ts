@@ -3,6 +3,7 @@ import familyData from "@/data/family.generated.json";
 export interface Person {
   id: string;
   name: string;
+  nameRoman: string;
   gender: "male" | "female";
   birthYear?: number | null;
   deathYear?: number | null;
