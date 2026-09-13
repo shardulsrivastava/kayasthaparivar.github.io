@@ -37,6 +37,22 @@ export default function Home() {
             that make up our family — from Barabanki and beyond.
           </p>
 
+          <section className="mx-auto mt-10 grid max-w-3xl grid-cols-3 gap-4 px-6">
+            {stats.map((stat) => (
+              <div
+                key={stat.label}
+                className="glass-panel rounded-2xl px-4 py-6 text-center"
+              >
+                <p className="font-heading text-3xl font-semibold text-gradient">
+                  {stat.value}
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {stat.label}
+                </p>
+              </div>
+            ))}
+          </section>
+
           <div className="mx-auto mt-10 max-w-xl">
             <SearchBar />
           </div>
@@ -46,22 +62,6 @@ export default function Home() {
               Explore the family tree
             </Button>
           </div>
-        </section>
-
-        <section className="mx-auto grid max-w-3xl grid-cols-3 gap-4 px-6 pb-16">
-          {stats.map((stat) => (
-            <div
-              key={stat.label}
-              className="glass-panel rounded-2xl px-4 py-6 text-center"
-            >
-              <p className="font-heading text-3xl font-semibold text-gradient">
-                {stat.value}
-              </p>
-              <p className="mt-1 text-xs text-muted-foreground">
-                {stat.label}
-              </p>
-            </div>
-          ))}
         </section>
 
         {elders.length > 0 ? (
