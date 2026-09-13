@@ -322,20 +322,20 @@ roots:
           - name: मातादीन (मतुआ लाला)
             gender: male
             children:
-              - name: शिव प्रसाद (दाढ़ी, दादा)
+              - name: शिव प्रसाद (दाढ़ी दादा)
                 gender: male
                 children:
                   - name: हरबहादुर
                     gender: male
                     children:
-                      - name: उमाकान्त कुमार
+                      - name: उमाकान्त कुमार (बचऊ)
                         gender: male
                         children:
-                          - name: इन्दु प्रकाश
+                          - name: इन्दु प्रकाश (नीलू)
                             gender: male
-                          - name: नवीन प्रकाश
+                          - name: नवीन प्रकाश (पंकज)
                             gender: male
-                          - name: वीर प्रकाश
+                          - name: वीर प्रकाश (झिंकन)
                             gender: male
                           - name: मधू
                             gender: female
@@ -346,6 +346,75 @@ roots:
                       - name: सूरत
                         gender: female
                         bio: बस्ती में ब्याही गई।
+                  - name: चम्पा
+                    gender: female
+                    bio: सिद्धौर में ब्याही गई।
+                  - name: कमलपति
+                    gender: female
+                    bio: लखनऊ में ब्याही गई।
+                  - name: जंग बहादुर
+                    gender: male
+                    children:
+                      - name: विनोद कुमार (किरी)
+                        gender: male
+                        children:
+                          - name: रूचिर (शचि)
+                            gender: male
+                            bio: Parent link uncertain in the scanned register (crossing lines) — please verify against the original.
+                            children:
+                              - name: दिविशा (दिवू) 
+                                gender: male
+                          - name: श्रेयांश (शिशु)
+                            gender: male
+                            children:
+                              - name: प्रज्ञाशिका
+                                gender: female
+                          - name: ऋषिका (रोली)
+                            gender: female
+                      - name: वीरेन्द्र कुमार
+                        gender: male
+                        children:
+                          - name: रत्नप्रिया (प्रिया)
+                            gender: female
+                          - name: शादुल (शुब्बू)
+                            gender: male
+                            children:
+                              - name: समायरा (सैमी)
+                                gender: female
+                      - name: धनश्याम (अनिल) 
+                        gender: male
+                        bio: Parent link uncertain in the scanned register (crossing lines) — please verify against the original.
+                        children:
+                          - name: विवेक
+                            gender: male
+                          - name: गौरव
+                            gender: male
+                      - name: प्रेम कुमार
+                        gender: male
+                        children:
+                          - name: श्वतांक (रोशी)
+                            gender: male
+                          - name: शुभांक (छुट्टू)
+                            gender: male
+                      - name: कुलदीप कुमार
+                        gender: male
+                        children:
+                          - name: स्वास्तिक (छुटपुट)
+                            gender: male
+          - name: बालगोविन्द (दादा)
+            gender: male
+            children:
+              - name: संगम लाल (जिलेदार)
+                gender: male
+              - name: महाराजबख्श
+                gender: male
+                children:
+                  - name: हिम्मत बहादुर
+                    gender: male
+                  - name: जयनरायन लाल
+                    gender: male
+                    bio: Parent link uncertain in the scanned register (crossing lines) — please verify against the original.
+                    children:
                       - name: कुँवर राज कुमार
                         gender: male
                         bio: Parent link uncertain in the scanned register (crossing lines) — please verify against the original.
@@ -441,71 +510,6 @@ roots:
                             gender: male
                           - name: वेद प्रकाश (रन्नू)
                             gender: male
-                  - name: चम्पा
-                    gender: female
-                    bio: सिद्धौर में ब्याही गई।
-                  - name: कमलपति
-                    gender: female
-                    bio: लखनऊ में ब्याही गई।
-                  - name: जंग बहादुर
-                    gender: male
-                    children:
-                      - name: विनोद कुमार
-                        gender: male
-                        children:
-                          - name: रूचिर
-                            gender: male
-                            bio: Parent link uncertain in the scanned register (crossing lines) — please verify against the original.
-                            children:
-                              - name: दिविश
-                                gender: male
-                              - name: प्रज्ञाशिका
-                                gender: female
-                          - name: श्रेयांश
-                            gender: male
-                          - name: ऋषिका
-                            gender: female
-                      - name: वीरेन्द्र कुमार
-                        gender: male
-                        children:
-                          - name: प्रिया
-                            gender: female
-                          - name: शादुल
-                            gender: male
-                      - name: धनश्याम
-                        gender: male
-                        bio: Parent link uncertain in the scanned register (crossing lines) — please verify against the original.
-                        children:
-                          - name: विवेकराज
-                            gender: male
-                          - name: गौरवराज
-                            gender: male
-                      - name: प्रेम कुमार
-                        gender: male
-                        children:
-                          - name: श्वतांक
-                            gender: male
-                          - name: शुभांक
-                            gender: male
-                      - name: कुलदीप कुमार
-                        gender: male
-                        children:
-                          - name: स्वास्तिक
-                            gender: male
-          - name: बालगोविन्द (दादा)
-            gender: male
-            children:
-              - name: संगम लाल (जिलेदार)
-                gender: male
-              - name: महाराजबख्श
-                gender: male
-                children:
-                  - name: हिम्मत बहादुर
-                    gender: male
-                  - name: जयनरायन लाल
-                    gender: male
-                    bio: Parent link uncertain in the scanned register (crossing lines) — please verify against the original.
-                    children:
                       - name: कृष्ण कुमार (राजन)
                         gender: male
                       - name: श्रीकान्त कुमार (मिस्टर)
