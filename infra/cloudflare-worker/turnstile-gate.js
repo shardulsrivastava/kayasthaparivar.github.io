@@ -41,15 +41,17 @@
  * points at the external origin, and resolve against THAT instead. This
  * repo's Terraform (infra/terraform/turnstile.tf) creates exactly that:
  *
- *   origin.kayasthaparivar.com   CNAME -> kayasthaparivar.github.io   (DNS only / grey-clouded)
+ *   <obfuscated-subdomain>.kayasthaparivar.com   CNAME -> kayasthaparivar.github.io   (DNS only / grey-clouded)
  *
  * Because that record is unproxied and is not itself covered by the
  * `kayasthaparivar.com/*` worker route, resolving against it never
- * re-enters this Worker. We fetch the *original* request URL (so the
- * `Host: kayasthaparivar.com` header GitHub Pages needs to pick the right
- * repo is preserved) but override DNS resolution to that in-zone CNAME:
+ * re-enters this Worker. The hostname is obfuscated (not a predictable "origin")
+ * so scrapers cannot query it directly to bypass Turnstile. We fetch the
+ * *original* request URL (so the `Host: kayasthaparivar.com` header GitHub Pages
+ * needs to pick the right repo is preserved) but override DNS resolution to
+ * that in-zone CNAME:
  *
- *   fetch(request, { cf: { resolveOverride: "origin.kayasthaparivar.com" } })
+ *   fetch(request, { cf: { resolveOverride: env.ORIGIN_RESOLVE_OVERRIDE } })
  *
  * That's the line to look at if this ever needs revisiting.
  */
@@ -73,7 +75,10 @@ const TURNSTILE_SITEVERIFY_URL =
 // In-zone DNS record created by infra/terraform/turnstile.tf specifically so
 // resolveOverride has a same-zone target that ultimately points at the real
 // GitHub Pages origin. See the file-level comment above for why this exists.
-const ORIGIN_RESOLVE_OVERRIDE = "origin.kayasthaparivar.com";
+// Uses an unguessable/obfuscated subdomain passed via ORIGIN_RESOLVE_OVERRIDE binding
+// (or falls back to DEFAULT_ORIGIN_RESOLVE_OVERRIDE) to prevent scrapers from directly
+// querying the unproxied origin DNS record and bypassing Turnstile.
+const DEFAULT_ORIGIN_RESOLVE_OVERRIDE = "origin-8f29c4a1.kayasthaparivar.com";
 
 export default {
   async fetch(request, env) {
@@ -84,7 +89,7 @@ export default {
     }
 
     if (await hasValidSessionCookie(request, env)) {
-      return proxyToOrigin(request);
+      return proxyToOrigin(request, env);
     }
 
     return renderChallengePage({
@@ -95,10 +100,12 @@ export default {
 };
 
 /** Forward an already-verified request to the real GitHub Pages origin. */
-function proxyToOrigin(request) {
+function proxyToOrigin(request, env) {
+  const originHost =
+    env?.ORIGIN_RESOLVE_OVERRIDE || DEFAULT_ORIGIN_RESOLVE_OVERRIDE;
   return fetch(request, {
     cf: {
-      resolveOverride: ORIGIN_RESOLVE_OVERRIDE,
+      resolveOverride: originHost,
     },
   });
 }

@@ -14,9 +14,10 @@ site, plus the Cloudflare zone SSL settings GitHub Pages needs.
   every request on `kayasthaparivar.com/*` and `www.kayasthaparivar.com/*`,
   which gates the whole site behind a Cloudflare Turnstile challenge — see
   "Turnstile site gate" below
-- `origin` CNAME → `kayasthaparivar.github.io`, **unproxied** (DNS only) —
-  an implementation detail the gate Worker needs, not a hostname meant to
-  be visited directly (see the comment in `turnstile.tf`)
+- Obfuscated origin CNAME (`var.origin_subdomain`, e.g. `origin-8f29c4a1`) →
+  `kayasthaparivar.github.io`, **unproxied** (DNS only) — an implementation
+  detail the gate Worker needs, not a hostname meant to be visited directly.
+  Obfuscated to prevent direct scraping bypasses of Turnstile (see `turnstile.tf`).
 
 ## One-time setup
 

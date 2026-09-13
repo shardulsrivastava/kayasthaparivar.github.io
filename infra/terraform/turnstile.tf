@@ -25,9 +25,13 @@
 # (unproxied): it's not meant to be a browsable hostname, and proxying it
 # would put it back behind (and re-trigger) the very Worker route it exists
 # to bypass.
+#
+# NOTE: The subdomain is deliberately obfuscated via var.origin_subdomain (instead
+# of a predictable "origin" hostname) to prevent scrapers from directly resolving
+# and querying the GitHub Pages origin to bypass the Turnstile gate.
 resource "cloudflare_record" "worker_origin" {
   zone_id = var.cloudflare_zone_id
-  name    = "origin"
+  name    = var.origin_subdomain
   type    = "CNAME"
   content = var.github_pages_target
   proxied = false
@@ -54,6 +58,11 @@ resource "cloudflare_workers_script" "turnstile_gate" {
   plain_text_binding {
     name = "TURNSTILE_SITE_KEY"
     text = var.turnstile_site_key
+  }
+
+  plain_text_binding {
+    name = "ORIGIN_RESOLVE_OVERRIDE"
+    text = "${var.origin_subdomain}.${var.domain}"
   }
 
   secret_text_binding {
