@@ -232,70 +232,6 @@ roots:
                     children:
                       - name: भगौती दयाल
                         gender: male
-                        children:
-                          - name: अशर्फीलाल
-                            gender: male
-                            children:
-                              - name: बृजमोहन
-                                gender: male
-                                children:
-                                  - name: नरेन्द्र बहादुर
-                                    gender: male
-                                    children:
-                                      - name: राम शंकर
-                                        gender: male
-                                        children:
-                                          - name: मुकेश
-                                            gender: male
-                                          - name: योगेश
-                                            gender: male
-                                  - name: सियाराम
-                                    gender: male
-                                  - name: रामलखन
-                                    gender: male
-                                    children:
-                                      - name: संजय कुमार
-                                        gender: male
-                                      - name: अजय कुमार
-                                        gender: male
-                                      - name: मनोज कुमार
-                                        gender: male
-                                        children:
-                                          - name: शिवराम बहादुर
-                                            gender: male
-                                            children:
-                                              - name: कमलेश
-                                                gender: male
-                                              - name: अरविंद
-                                                gender: male
-                                              - name: प्रदीप
-                                                gender: male
-                                              - name: राजेन्द्र
-                                                gender: male
-                                              - name: प्रेम
-                                                gender: male
-                                              - name: मालती
-                                                gender: female
-                                                bio: पुत्री; परिवार गाँव में रहा।
-                                                children:
-                                                  - name: पुष्पेन्द्र
-                                                    gender: male
-                                                    children:
-                                                      - name: विकास
-                                                        gender: male
-                                                      - name: विवेक
-                                                        gender: male
-                                                  - name: ओम प्रकाश
-                                                    gender: male
-                                                    children:
-                                                      - name: सन्दीप
-                                                        gender: male
-                                                      - name: कुलदीप
-                                                        gender: male
-                                              - name: तारा
-                                                gender: female
-                                              - name: उमा
-                                                gender: female
                       - name: राधेश्याम
                         gender: male
                       - name: धनश्याम
@@ -316,6 +252,69 @@ roots:
                     gender: male
                   - name: राम बख्श
                     gender: male
+              - name: अशर्फीलाल
+                gender: male
+                children:
+                  - name: बृजमोहन
+                    gender: male
+                    children:
+                      - name: नरेन्द्र बहादुर
+                        gender: male
+                        children:
+                          - name: राम शंकर
+                            gender: male
+                            children:
+                              - name: मुकेश
+                                gender: male
+                              - name: योगेश
+                                gender: male
+                      - name: सियाराम
+                        gender: male
+                      - name: रामलखन
+                        gender: male
+                        children:
+                          - name: संजय कुमार
+                            gender: male
+                          - name: अजय कुमार
+                            gender: male
+                          - name: मनोज कुमार
+                            gender: male
+                            children:
+                              - name: शिवराम बहादुर
+                                gender: male
+                                children:
+                                  - name: कमलेश
+                                    gender: male
+                                  - name: अरविंद
+                                    gender: male
+                                  - name: प्रदीप
+                                    gender: male
+                                  - name: राजेन्द्र
+                                    gender: male
+                                  - name: प्रेम
+                                    gender: male
+                                  - name: मालती
+                                    gender: female
+                                    bio: पुत्री; परिवार गाँव में रहा।
+                                    children:
+                                      - name: पुष्पेन्द्र
+                                        gender: male
+                                        children:
+                                          - name: विकास
+                                            gender: male
+                                          - name: विवेक
+                                            gender: male
+                                      - name: ओम प्रकाश
+                                        gender: male
+                                        children:
+                                          - name: सन्दीप
+                                            gender: male
+                                          - name: कुलदीप
+                                            gender: male
+                                  - name: तारा
+                                    gender: female
+                                  - name: उमा
+                                    gender: female
       - name: फुर्सतराय
         gender: male
         children:
