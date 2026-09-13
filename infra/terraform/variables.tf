@@ -21,6 +21,12 @@ variable "github_pages_target" {
   default     = "kayasthaparivar.github.io"
 }
 
+variable "origin_subdomain" {
+  description = "Obfuscated subdomain name for the unproxied origin CNAME used by resolveOverride to mitigate direct origin bypass."
+  type        = string
+  default     = "origin-8f29c4a1"
+}
+
 variable "cloudflare_account_id" {
   description = "Cloudflare account ID that owns the Worker used for the Turnstile site gate (Workers & Pages -> Overview in the dashboard shows it)."
   type        = string
