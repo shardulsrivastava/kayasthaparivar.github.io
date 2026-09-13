@@ -556,6 +556,8 @@ roots:
             children:
               - name: शिवनरायन (भइय्या)
                 gender: male
+              - name: रामनरायन (मुंशीलाला)
+                gender: male
                 children:
                   - name: इक्बाल बहादुर
                     gender: male
@@ -567,50 +569,51 @@ roots:
                             gender: male
                           - name: गुलशन
                             gender: male
-                          - name: सोनू (पप्पी)
+                          - name: सोनू 
                             gender: male
+                          - name: पप्पी
+                            gender: female
                       - name: सुषमा
                         gender: female
                       - name: मंजू
                         gender: female
                       - name: रेखा
                         gender: female
-                  - name: राजपती
-                    gender: female
-              - name: रामनरायन (मुंशीलाला)
-                gender: male
-                children:
-                  - name: कमलेश कुमार
-                    gender: male
-                    children:
-                      - name: सौरम
-                        gender: male
-                      - name: प्रखरराज
-                        gender: male
-                      - name: लकी
-                        gender: male
-                      - name: अनुष्का
-                        gender: female
-                  - name: सुशील कुमार
-                    gender: male
-                    children:
-                      - name: गुंजन
+                      - name: कमलेश कुमार
                         gender: male
                         children:
-                          - name: शगुन
+                          - name: गुंजन
                             gender: male
-                          - name: अथर्व
+                            children:
+                              - name: शगुन
+                                gender: male
+                              - name: अथर्व
+                                gender: male
+                          - name: कपिल
                             gender: male
-                          - name: रूद्र प्रताप सिंह
-                            gender: male
-                      - name: कपिल
+                            children:
+                              - name: रूद्र प्रताप सिंह
+                                gender: male
+                          - name: विम्मी
+                            gender: female
+                          - name: सिम्मी
+                            gender: female
+                      - name: सुशील कुमार
                         gender: male
-                      - name: विम्मी
-                        gender: female
-                      - name: सिम्मी
-                        gender: female
-                  - name: राकेश कुमार
-                    gender: male
+                        children:
+                          - name: सौरम
+                            gender: male
+                          - name: प्रखरराज
+                            gender: male
+                      - name: राकेश कुमार
+                        gender: male
+                        children:
+                          - name: लकी
+                            gender: male
+                          - name: अनुष्का
+                            gender: female
+                  - name: राजपती
+                    gender: female
               - name: महेश प्रसाद (दरिया)
                 gender: male
                 children:
@@ -628,32 +631,6 @@ roots:
                     children:
                       - name: शिव कुमार
                         gender: male
-                        bio: Parent link uncertain in the scanned register (crossing lines) — please verify against the original.
-                        children:
-                          - name: रनजीत कुमार (मुन्ना)
-                            gender: male
-                          - name: बृजेश कुमार (दिव0)
-                            gender: male
-                            bio: दिवंगत (दिव0)।
-                          - name: विवके कुमार (पुल्ली)
-                            gender: male
-                          - name: अंजनी कुमार (ननकऊ)
-                            gender: male
-                            children:
-                              - name: आनन्द कुमार
-                                gender: male
-                                children:
-                                  - name: शुभम
-                                    gender: male
-                              - name: ज्ञानेन्द्र कुमार
-                                gender: male
-                                children:
-                                  - name: सृष्टि
-                                    gender: female
-                              - name: मुकेश कुमार
-                                gender: male
-                              - name: धर्मेन्द्र कुमार
-                                gender: male
                       - name: प्रविन्द कुमार
                         gender: male
                   - name: सुरेन्द्र बहादुर (लल्लन)
@@ -663,11 +640,20 @@ roots:
                         gender: male
                       - name: गुड़िया
                         gender: female
+                      - name: बेबी
+                        gender: female
                   - name: शैलेन्द्र बहादुर (छोटे लाल)
                     gender: male
                     children:
-                      - name: बेबी
-                        gender: female
+                      - name: रनजीत कुमार (मुन्ना)
+                        gender: male
+                      - name: बृजेश कुमार (दिव0)
+                        gender: male
+                        bio: दिवंगत (दिव0)।
+                      - name: विवके कुमार (पुल्ली)
+                        gender: male
+                      - name: अंजनी कुमार (ननकऊ)
+                        gender: male
               - name: बृज बहादुर (बप्पा)
                 gender: male
                 bio: Parent link uncertain in the scanned register (crossing lines) — please verify against the original.
@@ -675,30 +661,48 @@ roots:
                   - name: राजेन्द्र बहादुर
                     gender: male
                     children:
+                      - name: आनन्द कुमार
+                        gender: male
+                        children:
+                          - name: शुभम
+                            gender: male
+                      - name: ज्ञानेन्द्र कुमार
+                        gender: male
+                        children:
+                          - name: सृष्टि
+                            gender: female
+                      - name: मुकेश कुमार
+                        gender: male
+                      - name: धर्मेन्द्र कुमार
+                        gender: male
+                  - name: कृष्ण प्रताप बहादुर
+                    gender: male
+                    children:
                       - name: सतीश कुमार
                         gender: male
                       - name: अरूण कुमार (दिव0)
                         gender: male
                         bio: दिवंगत (दिव0)।
-                        children:
-                          - name: धीरेन्द्र कुमार (संजय)
-                            gender: male
-                            children:
-                              - name: हर्ष
-                                gender: male
-                          - name: सन्तोष कुमार (पप्पू)
-                            gender: male
-                            children:
-                              - name: निशांत
-                                gender: male
-                              - name: दीप
-                                gender: male
-                  - name: कृष्ण प्रताप बहादुर
-                    gender: male
                   - name: सुरेन्द्र बहादुर
                     gender: male
+                    children:
+                      - name: धीरेन्द्र कुमार (संजय)
+                        gender: male
+                        children:
+                          - name: हर्ष
+                            gender: male
+                      - name: सन्तोष कुमार (पप्पू)
+                        gender: male
+                        children:
+                          - name: निशांत
+                            gender: male
+                          - name: दीप
+                            gender: male
                   - name: शैलेन्द्र बहादुर
                     gender: male
+                    children:
+                      - name: हिमांशू
+                        gender: male
                   - name: शीतला प्रसाद
                     gender: male
                     children:
@@ -709,13 +713,11 @@ roots:
                   - name: देवेन्द्र कुमार
                     gender: male
                     children:
-                      - name: हिमांशू
-                        gender: male
+                      - name: अल्पना
+                        gender: female
                   - name: जितेन्द्र कुमार
                     gender: male
                     children:
-                      - name: अल्पना
-                        gender: female
                       - name: देवा शीष
                         gender: male
                   - name: शोभा
