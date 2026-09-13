@@ -392,7 +392,7 @@ roots:
                       - name: प्रेम कुमार
                         gender: male
                         children:
-                          - name: श्वतांक (रोशी)
+                          - name: श्वेतांक (रोशी)
                             gender: male
                           - name: शुभांक (छुट्टू)
                             gender: male
@@ -426,94 +426,110 @@ roots:
                                 gender: female
                               - name: शैली
                                 gender: female
-                              - name: वरूण कुमार
+                              - name: वरूण कुमार (रीनु)
                                 gender: male
                           - name: विनय प्रकाश
                             gender: male
                             children:
-                              - name: विकान्त
+                              - name: विकान्त (लकी)
                                 gender: male
                                 children:
                                   - name: ध्रुव
                                     gender: male
                                     bio: Parent link uncertain in the scanned register (crossing lines) — please verify against the original.
-                                    children:
-                                      - name: प्रेम प्रकाश (बब्बू)
-                                        gender: male
-                                        children:
-                                          - name: ऋषि राजन
-                                            gender: male
-                                          - name: शिवाराजन
-                                            gender: male
-                                      - name: विजय प्रकाश (सम्भू)
-                                        gender: male
-                                        children:
-                                          - name: देवा राजन
-                                            gender: male
-                                          - name: धवल राजन
-                                            gender: male
-                                      - name: अजीत प्रकाश
-                                        gender: male
-                                        children:
-                                          - name: उज्जवल
-                                            gender: male
-                                            bio: Parent link uncertain in the scanned register (crossing lines) — please verify against the original.
-                                            children:
-                                              - name: अजय प्रकाश
-                                                gender: male
-                                                children:
-                                                  - name: करिश्मी
-                                                    gender: female
-                                                  - name: एकती
-                                                    gender: female
-                                                  - name: लवकान्त
-                                                    gender: male
-                                              - name: उदय प्रकाश
-                                                gender: male
-                                                children:
-                                                  - name: वत्सल
-                                                    gender: male
-                                                  - name: सौम्य
-                                                    gender: male
-                                              - name: आनन्द प्रकाश (कन्हैया)
-                                                gender: male
-                                                children:
-                                                  - name: देवकान्त
-                                                    gender: male
-                                              - name: अमित प्रकाश (रिंकू)
-                                                gender: male
-                                              - name: नीता
-                                                gender: female
-                                                bio: फतेहपुर में ब्याही गई।
-                                              - name: मीनू
-                                                gender: female
-                                                bio: दिवंगत (दिव0)।
-                                          - name: प्रज्जवल
-                                            gender: male
-                                      - name: बीना
-                                        gender: female
-                                        bio: लखनऊ में ब्याही गई।
-                                      - name: रीता
-                                        gender: female
-                                        bio: गोण्डा में ब्याही गई।
-                                      - name: इन्दिरा
-                                        gender: female
-                                        bio: लखनऊ में ब्याही गई।
-                              - name: विराट
-                                gender: male
-                              - name: हर्षिता
-                                gender: female
-                                bio: दिवंगत (दिव0)।
-                              - name: विशाल कुँवर
+                              - name: विराट (बड़ा गोलू)
                                 gender: male
                           - name: सत्य प्रकाश (रन्नू)
                             gender: male
+                            children:
+                              - name: हर्षिता
+                                gender: female
+                                bio: दिवंगत (दिव0)।
+                              - name: विशाल कुँवर (गोलू)
+                                gender: male
                           - name: वेद प्रकाश (रन्नू)
                             gender: male
                       - name: कृष्ण कुमार (राजन)
                         gender: male
+                        children:
+                          - name: प्रेम प्रकाश (बब्बू)
+                            gender: male
+                            children:
+                              - name: ऋषि
+                                gender: male
+                                children:
+                                  - name: भुवि
+                                    gender: female
+                              - name: शिवा
+                                gender: male
+                                children:
+                                  - name: TBA
+                                    gender: male
+                                  - name: TBA
+                                    gender: female
+                          - name: विजय प्रकाश (सम्भू)
+                            gender: male
+                            children:
+                              - name: देवा
+                                gender: male
+                                children:
+                                  - name: TBA
+                                    gender: female
+                                  - name: TBA
+                                    gender: female
+                              - name: धवल
+                                gender: male
+                                children:
+                                  - name: TBA
+                                    gender: male
+                          - name: अजीत प्रकाश
+                            gender: male
+                            children:
+                              - name: उज्जवल (उज्जी)
+                                gender: male
+                              - name: प्रज्जवल (प्रज्जी)
+                                gender: male
+                          - name: बीना
+                            gender: female
+                            bio: लखनऊ में ब्याही गई।
+                          - name: रीता
+                            gender: female
+                            bio: गोण्डा में ब्याही गई।
+                          - name: इन्दिरा
+                            gender: female
+                            bio: लखनऊ में ब्याही गई।
                       - name: श्रीकान्त कुमार (मिस्टर)
                         gender: male
+                        children:
+                          - name: अजय प्रकाश (घप्पू)
+                            gender: male
+                            children:
+                              - name: करिश्मी
+                                gender: female
+                              - name: एकती
+                                gender: female
+                              - name: लवकान्त
+                                gender: male
+                          - name: उदय प्रकाश (पप्पू) 
+                            gender: male
+                            children:
+                              - name: वत्सल
+                                gender: male
+                              - name: सौम्य
+                                gender: male
+                          - name: आनन्द प्रकाश (कन्हैया)
+                            gender: male
+                            children:
+                              - name: देवकान्त
+                                gender: male
+                          - name: अमित प्रकाश (रिंकू)
+                            gender: male
+                          - name: नीता
+                            gender: female
+                            bio: फतेहपुर में ब्याही गई।
+                          - name: मीनू
+                            gender: female
+                            bio: दिवंगत (दिव0)।
                       - name: राय साहेब
                         gender: male
                       - name: दिनेश कुमार (लाल साहेब)
@@ -521,15 +537,14 @@ roots:
                         children:
                           - name: रवि प्रकाश (अतुल)
                             gender: male
-                            children:
-                              - name: शुभी
-                                gender: female
-                              - name: श्रेया
-                                gender: female
                           - name: सुनील प्रकाश
                             gender: male
                             children:
                               - name: प्राख्या
+                                gender: female
+                              - name: शुभी
+                                gender: female
+                              - name: श्रेया
                                 gender: female
                       - name: न्योरा
                         gender: female
