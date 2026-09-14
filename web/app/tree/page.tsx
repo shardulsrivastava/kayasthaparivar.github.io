@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { SiteHeader } from "@/components/site-header";
 import { FamilyTree } from "@/components/family-tree";
 
@@ -19,7 +20,9 @@ export default function TreePage() {
             profile.
           </p>
         </div>
-        <FamilyTree />
+        <Suspense fallback={null}>
+          <FamilyTree />
+        </Suspense>
       </main>
     </div>
   );

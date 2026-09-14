@@ -10,6 +10,7 @@ import {
 } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useSearchParams } from "next/navigation";
 import { ChevronDown, ArrowUpRight } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { getTreeRoots, getPersonById, lifespan, type EnrichedPerson } from "@/lib/family";
@@ -60,6 +61,27 @@ function unitAnchor(
     top: Math.min(p1.top, p2.top),
     bottom: Math.max(p1.bottom, p2.bottom),
   };
+}
+
+// All ancestor ids (parents, grandparents, ...) of a person, so the tree
+// can be expanded just enough to make that person visible. Walks every
+// recorded parent id (blood parent and married-in spouse alike) - a
+// married-in spouse's own `parents` list is simply empty, which ends that
+// branch of the walk without needing to tell the two apart.
+function collectAncestorIds(personId: string): Set<string> {
+  const ids = new Set<string>();
+  function walk(id: string) {
+    const person = getPersonById(id);
+    if (!person) return;
+    for (const parentId of person.parents) {
+      if (!ids.has(parentId)) {
+        ids.add(parentId);
+        walk(parentId);
+      }
+    }
+  }
+  walk(personId);
+  return ids;
 }
 
 function TreeCard({
@@ -210,6 +232,14 @@ export function FamilyTree() {
   const nodeRefs = useRef(new Map<string, HTMLDivElement>());
   const [links, setLinks] = useState<LinkPath[]>([]);
 
+  // Search hand-off: `/tree?focus=<personId>` expands every ancestor of
+  // that person so their card is mounted, then scrolls to and briefly
+  // highlights it. Unknown/absent `focus` leaves everything as-is.
+  const searchParams = useSearchParams();
+  const focusId = searchParams.get("focus");
+  const focusHandledRef = useRef<string | null>(null);
+  const activeHighlightRef = useRef<{ el: HTMLDivElement; timer: ReturnType<typeof setTimeout> } | null>(null);
+
   const toggle = useCallback((id: string) => {
     setExpanded((prev) => {
       const next = new Set(prev);
@@ -266,6 +296,51 @@ export function FamilyTree() {
       window.removeEventListener("resize", recompute);
     };
   }, [recompute]);
+
+  // Expand every ancestor of the focused person so their card is mounted.
+  // A missing/unknown `focus` id leaves `expanded` untouched.
+  useEffect(() => {
+    if (!focusId) return;
+    if (!getPersonById(focusId)) return;
+    const ancestorIds = collectAncestorIds(focusId);
+    if (ancestorIds.size === 0) return;
+    setExpanded((prev) => {
+      let changed = false;
+      const next = new Set(prev);
+      for (const id of ancestorIds) {
+        if (!next.has(id)) {
+          next.add(id);
+          changed = true;
+        }
+      }
+      return changed ? next : prev;
+    });
+  }, [focusId]);
+
+  // Once the focused person's card is mounted (its ref registered by the
+  // expand above), scroll it into view and briefly highlight it. The
+  // highlight is applied imperatively (not via state) so that a large
+  // expansion doesn't force a full tree re-render in the same tick as
+  // scrollIntoView - that re-render was racing the smooth-scroll animation
+  // and silently cancelling it for deep expansions with many mounted cards.
+  useEffect(() => {
+    if (!focusId || focusHandledRef.current === focusId) return;
+    const el = nodeRefs.current.get(focusId);
+    if (!el) return;
+    focusHandledRef.current = focusId;
+    el.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
+
+    if (activeHighlightRef.current) {
+      clearTimeout(activeHighlightRef.current.timer);
+      activeHighlightRef.current.el.classList.remove("glow-accent", "ring-2", "ring-accent");
+    }
+    el.classList.add("glow-accent", "ring-2", "ring-accent");
+    const timer = setTimeout(() => {
+      el.classList.remove("glow-accent", "ring-2", "ring-accent");
+      activeHighlightRef.current = null;
+    }, 2500);
+    activeHighlightRef.current = { el, timer };
+  }, [focusId, expanded]);
 
   useEffect(() => {
     const el = scrollRef.current;
