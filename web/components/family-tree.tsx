@@ -63,24 +63,15 @@ function unitAnchor(
   };
 }
 
-// All ancestor ids (parents, grandparents, ...) of a person, so the tree
-// can be expanded just enough to make that person visible. Walks every
-// recorded parent id (blood parent and married-in spouse alike) - a
-// married-in spouse's own `parents` list is simply empty, which ends that
-// branch of the walk without needing to tell the two apart.
-function collectAncestorIds(personId: string): Set<string> {
+// Get only the direct parent ids of a person (no grandparents, great-grandparents, etc).
+// This keeps the search tree minimal and focused on the searched person.
+function getDirectParentIds(personId: string): Set<string> {
   const ids = new Set<string>();
-  function walk(id: string) {
-    const person = getPersonById(id);
-    if (!person) return;
-    for (const parentId of person.parents) {
-      if (!ids.has(parentId)) {
-        ids.add(parentId);
-        walk(parentId);
-      }
-    }
+  const person = getPersonById(personId);
+  if (!person) return ids;
+  for (const parentId of person.parents) {
+    ids.add(parentId);
   }
-  walk(personId);
   return ids;
 }
 
@@ -297,17 +288,17 @@ export function FamilyTree() {
     };
   }, [recompute]);
 
-  // Expand every ancestor of the focused person so their card is mounted.
-  // A missing/unknown `focus` id leaves `expanded` untouched.
+  // Expand only the direct parent of the focused person for minimal context.
+  // This keeps the search tree focused and easy to explore one level at a time.
   useEffect(() => {
     if (!focusId) return;
     if (!getPersonById(focusId)) return;
-    const ancestorIds = collectAncestorIds(focusId);
-    if (ancestorIds.size === 0) return;
+    const parentIds = getDirectParentIds(focusId);
+    if (parentIds.size === 0) return;
     setExpanded((prev) => {
       let changed = false;
       const next = new Set(prev);
-      for (const id of ancestorIds) {
+      for (const id of parentIds) {
         if (!next.has(id)) {
           next.add(id);
           changed = true;
