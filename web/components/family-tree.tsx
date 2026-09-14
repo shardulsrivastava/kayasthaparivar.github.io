@@ -238,8 +238,17 @@ function TreeUnit({
 
 export function FamilyTree() {
   const roots = useMemo(() => getTreeRoots(), []);
+  const searchParams = useSearchParams();
+  const focusId = searchParams.get("focus");
+
   const [expanded, setExpanded] = useState<Set<string>>(
-    () => new Set(roots.map((r) => r.id)),
+    () => {
+      // When focusing on a specific person, start with no expanded roots.
+      // Only expand the focused person's direct lineage, keeping everything
+      // else collapsed. When not focused, show all roots expanded.
+      if (focusId) return new Set();
+      return new Set(roots.map((r) => r.id));
+    },
   );
   const scrollRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -249,8 +258,6 @@ export function FamilyTree() {
   // Search hand-off: `?focus=<personId>` expands every ancestor of
   // that person so their card is mounted, then scrolls to and briefly
   // highlights it. Unknown/absent `focus` leaves everything as-is.
-  const searchParams = useSearchParams();
-  const focusId = searchParams.get("focus");
   const focusHandledRef = useRef<string | null>(null);
   const activeHighlightRef = useRef<{ el: HTMLDivElement; timer: ReturnType<typeof setTimeout> } | null>(null);
 
