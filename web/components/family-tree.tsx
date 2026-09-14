@@ -292,9 +292,9 @@ export function FamilyTree() {
     };
   }, [recompute]);
 
-  // Expand the entire ancestor chain of the focused person so they can be rendered.
-  // Without this, if the person is multiple levels deep, their parent node won't mount,
-  // and their ref won't be registered, preventing scroll/highlight from working.
+  // Expand the entire ancestor chain of the focused person so they render.
+  // All ancestors must be in expanded for any descendant to mount in the tree.
+  // Users can collapse any ancestor by clicking its chevron to reduce clutter.
   useEffect(() => {
     if (!focusId) return;
     if (!getPersonById(focusId)) return;
