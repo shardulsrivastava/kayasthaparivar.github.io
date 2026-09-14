@@ -63,15 +63,19 @@ function unitAnchor(
   };
 }
 
-// Get only the direct parent ids of a person (no grandparents, great-grandparents, etc).
-// This keeps the search tree minimal and focused on the searched person.
-function getDirectParentIds(personId: string): Set<string> {
+function collectAncestorIds(personId: string): Set<string> {
   const ids = new Set<string>();
-  const person = getPersonById(personId);
-  if (!person) return ids;
-  for (const parentId of person.parents) {
-    ids.add(parentId);
+  function walk(id: string) {
+    const person = getPersonById(id);
+    if (!person) return;
+    for (const parentId of person.parents) {
+      if (!ids.has(parentId)) {
+        ids.add(parentId);
+        walk(parentId);
+      }
+    }
   }
+  walk(personId);
   return ids;
 }
 
@@ -288,17 +292,18 @@ export function FamilyTree() {
     };
   }, [recompute]);
 
-  // Expand only the direct parent of the focused person for minimal context.
-  // This keeps the search tree focused and easy to explore one level at a time.
+  // Expand the entire ancestor chain of the focused person so they can be rendered.
+  // Without this, if the person is multiple levels deep, their parent node won't mount,
+  // and their ref won't be registered, preventing scroll/highlight from working.
   useEffect(() => {
     if (!focusId) return;
     if (!getPersonById(focusId)) return;
-    const parentIds = getDirectParentIds(focusId);
-    if (parentIds.size === 0) return;
+    const ancestorIds = collectAncestorIds(focusId);
+    if (ancestorIds.size === 0) return;
     setExpanded((prev) => {
       let changed = false;
       const next = new Set(prev);
-      for (const id of parentIds) {
+      for (const id of ancestorIds) {
         if (!next.has(id)) {
           next.add(id);
           changed = true;
