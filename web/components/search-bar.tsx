@@ -25,7 +25,7 @@ export function SearchBar() {
             <CommandItem
               key={person.id}
               value={`${person.name} ${person.nameRoman}`}
-              onSelect={() => router.push(`/tree?focus=${person.id}`)}
+              onSelect={() => router.push(`/?focus=${person.id}`)}
               className="cursor-pointer"
             >
               <span>{person.name}</span>

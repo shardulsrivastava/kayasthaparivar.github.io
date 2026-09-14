@@ -166,4 +166,28 @@
     -webkit-background-clip: text;
     color: transparent;
   }
+
+  .highlight-pulse {
+    animation: highlight-pulse 2s ease-in-out;
+  }
+
+  @keyframes highlight-pulse {
+    0% {
+      box-shadow:
+        0 0 0 2px oklch(0.68 0.19 305 / 60%),
+        0 0 32px oklch(0.68 0.19 305 / 50%),
+        0 0 64px oklch(0.68 0.19 305 / 25%);
+    }
+    50% {
+      box-shadow:
+        0 0 0 2px oklch(0.68 0.19 305 / 40%),
+        0 0 24px oklch(0.68 0.19 305 / 35%),
+        0 0 48px oklch(0.68 0.19 305 / 15%);
+    }
+    100% {
+      box-shadow:
+        0 0 0 1px oklch(0.68 0.19 305 / 30%),
+        0 0 24px oklch(0.68 0.19 305 / 25%);
+    }
+  }
 }

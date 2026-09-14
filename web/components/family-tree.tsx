@@ -232,7 +232,7 @@ export function FamilyTree() {
   const nodeRefs = useRef(new Map<string, HTMLDivElement>());
   const [links, setLinks] = useState<LinkPath[]>([]);
 
-  // Search hand-off: `/tree?focus=<personId>` expands every ancestor of
+  // Search hand-off: `?focus=<personId>` expands every ancestor of
   // that person so their card is mounted, then scrolls to and briefly
   // highlights it. Unknown/absent `focus` leaves everything as-is.
   const searchParams = useSearchParams();
@@ -332,13 +332,13 @@ export function FamilyTree() {
 
     if (activeHighlightRef.current) {
       clearTimeout(activeHighlightRef.current.timer);
-      activeHighlightRef.current.el.classList.remove("glow-accent", "ring-2", "ring-accent");
+      activeHighlightRef.current.el.classList.remove("glow-accent", "ring-2", "ring-accent", "highlight-pulse");
     }
-    el.classList.add("glow-accent", "ring-2", "ring-accent");
+    el.classList.add("glow-accent", "ring-2", "ring-accent", "highlight-pulse");
     const timer = setTimeout(() => {
-      el.classList.remove("glow-accent", "ring-2", "ring-accent");
+      el.classList.remove("glow-accent", "ring-2", "ring-accent", "highlight-pulse");
       activeHighlightRef.current = null;
-    }, 2500);
+    }, 4000);
     activeHighlightRef.current = { el, timer };
   }, [focusId, expanded]);
 
