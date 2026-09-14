@@ -318,24 +318,25 @@ export function FamilyTree() {
     };
   }, [recompute]);
 
-  // Expand the entire ancestor chain of the focused person so they render.
-  // All ancestors must be in expanded for any descendant to mount in the tree.
-  // Users can collapse any ancestor by clicking its chevron to reduce clutter.
+  // Expand the ancestor chain of the focused person, but only show the
+  // direct parent. Grandparents and above are mounted (required for rendering)
+  // but auto-collapsed, keeping the view focused on the search result.
   useEffect(() => {
     if (!focusId) return;
     if (!getPersonById(focusId)) return;
     const ancestorIds = collectAncestorIds(focusId);
     if (ancestorIds.size === 0) return;
+    const directParents = getDirectParentIds(focusId);
     setExpanded((prev) => {
-      let changed = false;
       const next = new Set(prev);
       for (const id of ancestorIds) {
-        if (!next.has(id)) {
+        if (directParents.has(id)) {
           next.add(id);
-          changed = true;
+        } else {
+          next.delete(id);
         }
       }
-      return changed ? next : prev;
+      return next;
     });
   }, [focusId]);
 
