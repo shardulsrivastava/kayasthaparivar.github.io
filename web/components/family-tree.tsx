@@ -63,6 +63,16 @@ function unitAnchor(
   };
 }
 
+function getDirectParentIds(personId: string): Set<string> {
+  const ids = new Set<string>();
+  const person = getPersonById(personId);
+  if (!person) return ids;
+  for (const parentId of person.parents) {
+    ids.add(parentId);
+  }
+  return ids;
+}
+
 function collectAncestorIds(personId: string): Set<string> {
   const ids = new Set<string>();
   function walk(id: string) {
