@@ -237,8 +237,8 @@ export function FamilyTree() {
   // highlights it. Unknown/absent `focus` leaves everything as-is.
   const searchParams = useSearchParams();
   const focusId = searchParams.get("focus");
-  const [highlightId, setHighlightId] = useState<string | null>(null);
   const focusHandledRef = useRef<string | null>(null);
+  const activeHighlightRef = useRef<{ el: HTMLDivElement; timer: ReturnType<typeof setTimeout> } | null>(null);
 
   const toggle = useCallback((id: string) => {
     setExpanded((prev) => {
@@ -318,29 +318,29 @@ export function FamilyTree() {
   }, [focusId]);
 
   // Once the focused person's card is mounted (its ref registered by the
-  // expand above), scroll it into view and flag it for a brief highlight.
+  // expand above), scroll it into view and briefly highlight it. The
+  // highlight is applied imperatively (not via state) so that a large
+  // expansion doesn't force a full tree re-render in the same tick as
+  // scrollIntoView - that re-render was racing the smooth-scroll animation
+  // and silently cancelling it for deep expansions with many mounted cards.
   useEffect(() => {
     if (!focusId || focusHandledRef.current === focusId) return;
     const el = nodeRefs.current.get(focusId);
     if (!el) return;
     focusHandledRef.current = focusId;
     el.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
-    setHighlightId(focusId);
-    const timer = setTimeout(() => setHighlightId(null), 2500);
-    return () => clearTimeout(timer);
-  }, [focusId, expanded]);
 
-  // Apply/remove the highlight classes imperatively so the card components
-  // don't need to know about focus state.
-  useEffect(() => {
-    if (!highlightId) return;
-    const el = nodeRefs.current.get(highlightId);
-    if (!el) return;
+    if (activeHighlightRef.current) {
+      clearTimeout(activeHighlightRef.current.timer);
+      activeHighlightRef.current.el.classList.remove("glow-accent", "ring-2", "ring-accent");
+    }
     el.classList.add("glow-accent", "ring-2", "ring-accent");
-    return () => {
+    const timer = setTimeout(() => {
       el.classList.remove("glow-accent", "ring-2", "ring-accent");
-    };
-  }, [highlightId]);
+      activeHighlightRef.current = null;
+    }, 2500);
+    activeHighlightRef.current = { el, timer };
+  }, [focusId, expanded]);
 
   useEffect(() => {
     const el = scrollRef.current;
