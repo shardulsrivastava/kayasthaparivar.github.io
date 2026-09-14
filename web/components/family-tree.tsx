@@ -79,6 +79,16 @@ function collectAncestorIds(personId: string): Set<string> {
   return ids;
 }
 
+function isDescendantOf(personId: string, ancestorId: string): boolean {
+  if (personId === ancestorId) return true;
+  const person = getPersonById(personId);
+  if (!person) return false;
+  for (const parentId of person.parents) {
+    if (isDescendantOf(parentId, ancestorId)) return true;
+  }
+  return false;
+}
+
 function TreeCard({
   person,
   ref,
@@ -163,14 +173,22 @@ function TreeUnit({
   expanded,
   toggle,
   registerRef,
+  focusId,
 }: {
   person: EnrichedPerson;
   expanded: Set<string>;
   toggle: (id: string) => void;
   registerRef: (id: string, el: HTMLDivElement | null) => void;
+  focusId?: string | null;
 }) {
   const spouse = person.spouses[0] ? getPersonById(person.spouses[0]) : undefined;
-  const childIds = unitChildren(person);
+  const allChildIds = unitChildren(person);
+
+  // When focused, only show children on the path to the focused person
+  const childIds = focusId
+    ? allChildIds.filter((id) => isDescendantOf(focusId, id))
+    : allChildIds;
+
   const hasChildren = childIds.length > 0;
   const isExpanded = expanded.has(person.id);
 
@@ -208,6 +226,7 @@ function TreeUnit({
                 expanded={expanded}
                 toggle={toggle}
                 registerRef={registerRef}
+                focusId={focusId}
               />
             ) : null;
           })}
@@ -471,6 +490,7 @@ export function FamilyTree() {
             expanded={expanded}
             toggle={toggle}
             registerRef={registerRef}
+            focusId={focusId}
           />
         ))}
       </div>
