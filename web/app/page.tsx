@@ -1,14 +1,12 @@
-import Link from "next/link";
+import { Suspense } from "react";
 import { SiteHeader } from "@/components/site-header";
 import { SearchBar } from "@/components/search-bar";
-import { PersonNode } from "@/components/person-node";
-import { Button } from "@/components/ui/button";
+import { FamilyTree } from "@/components/family-tree";
 import { getAllPeople, getGenerations } from "@/lib/family";
 
 export default function Home() {
   const people = getAllPeople();
   const generations = getGenerations();
-  const elders = generations[0] ?? [];
   const birthYears = people
     .map((p) => p.birthYear)
     .filter((y): y is number => !!y);
@@ -56,26 +54,16 @@ export default function Home() {
           <div className="mx-auto mt-10 max-w-xl">
             <SearchBar />
           </div>
-
-          <div className="mt-8 flex justify-center gap-4">
-            <Button size="lg" render={<Link href="/tree" />}>
-              Explore the family tree
-            </Button>
-          </div>
         </section>
 
-        {elders.length > 0 ? (
-          <section className="mx-auto max-w-5xl px-6 pb-24">
-            <h2 className="mb-8 text-center font-heading text-xl text-muted-foreground">
-              Where it all began
-            </h2>
-            <div className="flex flex-wrap justify-center gap-6">
-              {elders.map((person) => (
-                <PersonNode key={person.id} person={person} />
-              ))}
-            </div>
-          </section>
-        ) : null}
+        <section className="mx-auto max-w-7xl px-6 pb-24">
+          <h2 className="mb-8 text-center font-heading text-xl text-muted-foreground">
+            Where it all began
+          </h2>
+          <Suspense fallback={null}>
+            <FamilyTree />
+          </Suspense>
+        </section>
       </main>
 
       <footer className="border-t border-white/10 py-8 text-center text-xs text-muted-foreground">
