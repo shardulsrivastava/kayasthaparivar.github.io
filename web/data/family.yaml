@@ -413,11 +413,9 @@ roots:
                     gender: male
                   - name: जयनरायन लाल
                     gender: male
-                    bio: Parent link uncertain in the scanned register (crossing lines) — please verify against the original.
                     children:
                       - name: कुँवर राज कुमार
                         gender: male
-                        bio: Parent link uncertain in the scanned register (crossing lines) — please verify against the original.
                         children:
                           - name: चन्द्र प्रकाश (जलाली)
                             gender: male
@@ -428,7 +426,7 @@ roots:
                                 gender: female
                               - name: वरूण कुमार (रीनु)
                                 gender: male
-                          - name: विनय प्रकाश
+                          - name: विनय प्रकाश (दातिनी)
                             gender: male
                             children:
                               - name: विकान्त (लकी)
@@ -436,7 +434,6 @@ roots:
                                 children:
                                   - name: ध्रुव
                                     gender: male
-                                    bio: Parent link uncertain in the scanned register (crossing lines) — please verify against the original.
                               - name: विराट (बड़ा गोलू)
                                 gender: male
                           - name: सत्य प्रकाश (रन्नू)
@@ -463,9 +460,9 @@ roots:
                               - name: शिवा
                                 gender: male
                                 children:
-                                  - name: TBA
+                                  - name: प्रयान
                                     gender: male
-                                  - name: TBA
+                                  - name: प्रान्वी
                                     gender: female
                           - name: विजय प्रकाश (सम्भू)
                             gender: male
@@ -473,14 +470,14 @@ roots:
                               - name: देवा
                                 gender: male
                                 children:
-                                  - name: TBA
+                                  - name: इवांशी
                                     gender: female
-                                  - name: TBA
+                                  - name: अन्वया
                                     gender: female
                               - name: धवल
                                 gender: male
                                 children:
-                                  - name: TBA
+                                  - name: रणविजय
                                     gender: male
                           - name: अजीत प्रकाश
                             gender: male
