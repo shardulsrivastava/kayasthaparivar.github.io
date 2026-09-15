@@ -360,7 +360,6 @@ roots:
                         children:
                           - name: रूचिर (शचि)
                             gender: male
-                            bio: Parent link uncertain in the scanned register (crossing lines) — please verify against the original.
                             children:
                               - name: दिविशा (दिवू) 
                                 gender: male
@@ -376,14 +375,13 @@ roots:
                         children:
                           - name: रत्नप्रिया (प्रिया)
                             gender: female
-                          - name: शादुल (शुब्बू)
+                          - name: शार्दूल (शुब्बू)
                             gender: male
                             children:
                               - name: समायरा (सैमी)
                                 gender: female
                       - name: धनश्याम (अनिल) 
                         gender: male
-                        bio: Parent link uncertain in the scanned register (crossing lines) — please verify against the original.
                         children:
                           - name: विवेक
                             gender: male
