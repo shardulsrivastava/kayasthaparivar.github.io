@@ -63,11 +63,16 @@ function unitAnchor(
   };
 }
 
-// All ancestor ids (parents, grandparents, ...) of a person, so the tree
-// can be expanded just enough to make that person visible. Walks every
-// recorded parent id (blood parent and married-in spouse alike) - a
-// married-in spouse's own `parents` list is simply empty, which ends that
-// branch of the walk without needing to tell the two apart.
+function getDirectParentIds(personId: string): Set<string> {
+  const ids = new Set<string>();
+  const person = getPersonById(personId);
+  if (!person) return ids;
+  for (const parentId of person.parents) {
+    ids.add(parentId);
+  }
+  return ids;
+}
+
 function collectAncestorIds(personId: string): Set<string> {
   const ids = new Set<string>();
   function walk(id: string) {
@@ -82,6 +87,16 @@ function collectAncestorIds(personId: string): Set<string> {
   }
   walk(personId);
   return ids;
+}
+
+function isDescendantOf(personId: string, ancestorId: string): boolean {
+  if (personId === ancestorId) return true;
+  const person = getPersonById(personId);
+  if (!person) return false;
+  for (const parentId of person.parents) {
+    if (isDescendantOf(parentId, ancestorId)) return true;
+  }
+  return false;
 }
 
 function TreeCard({
@@ -168,14 +183,22 @@ function TreeUnit({
   expanded,
   toggle,
   registerRef,
+  focusId,
 }: {
   person: EnrichedPerson;
   expanded: Set<string>;
   toggle: (id: string) => void;
   registerRef: (id: string, el: HTMLDivElement | null) => void;
+  focusId?: string | null;
 }) {
   const spouse = person.spouses[0] ? getPersonById(person.spouses[0]) : undefined;
-  const childIds = unitChildren(person);
+  const allChildIds = unitChildren(person);
+
+  // When focused, only show children on the path to the focused person
+  const childIds = focusId
+    ? allChildIds.filter((id) => isDescendantOf(focusId, id))
+    : allChildIds;
+
   const hasChildren = childIds.length > 0;
   const isExpanded = expanded.has(person.id);
 
@@ -213,6 +236,7 @@ function TreeUnit({
                 expanded={expanded}
                 toggle={toggle}
                 registerRef={registerRef}
+                focusId={focusId}
               />
             ) : null;
           })}
@@ -224,8 +248,17 @@ function TreeUnit({
 
 export function FamilyTree() {
   const roots = useMemo(() => getTreeRoots(), []);
+  const searchParams = useSearchParams();
+  const focusId = searchParams.get("focus");
+
   const [expanded, setExpanded] = useState<Set<string>>(
-    () => new Set(roots.map((r) => r.id)),
+    () => {
+      // When focusing on a specific person, start with no expanded roots.
+      // Only expand the focused person's direct lineage, keeping everything
+      // else collapsed. When not focused, show all roots expanded.
+      if (focusId) return new Set();
+      return new Set(roots.map((r) => r.id));
+    },
   );
   const scrollRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -235,8 +268,6 @@ export function FamilyTree() {
   // Search hand-off: `?focus=<personId>` expands every ancestor of
   // that person so their card is mounted, then scrolls to and briefly
   // highlights it. Unknown/absent `focus` leaves everything as-is.
-  const searchParams = useSearchParams();
-  const focusId = searchParams.get("focus");
   const focusHandledRef = useRef<string | null>(null);
   const activeHighlightRef = useRef<{ el: HTMLDivElement; timer: ReturnType<typeof setTimeout> } | null>(null);
 
@@ -297,23 +328,25 @@ export function FamilyTree() {
     };
   }, [recompute]);
 
-  // Expand every ancestor of the focused person so their card is mounted.
-  // A missing/unknown `focus` id leaves `expanded` untouched.
+  // Expand the ancestor chain of the focused person, but only show the
+  // direct parent. Grandparents and above are mounted (required for rendering)
+  // but auto-collapsed, keeping the view focused on the search result.
   useEffect(() => {
     if (!focusId) return;
     if (!getPersonById(focusId)) return;
     const ancestorIds = collectAncestorIds(focusId);
     if (ancestorIds.size === 0) return;
+    const directParents = getDirectParentIds(focusId);
     setExpanded((prev) => {
-      let changed = false;
       const next = new Set(prev);
       for (const id of ancestorIds) {
-        if (!next.has(id)) {
+        if (directParents.has(id)) {
           next.add(id);
-          changed = true;
+        } else {
+          next.delete(id);
         }
       }
-      return changed ? next : prev;
+      return next;
     });
   }, [focusId]);
 
@@ -475,6 +508,7 @@ export function FamilyTree() {
             expanded={expanded}
             toggle={toggle}
             registerRef={registerRef}
+            focusId={focusId}
           />
         ))}
       </div>
