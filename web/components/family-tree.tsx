@@ -184,12 +184,18 @@ function TreeUnit({
   toggle,
   registerRef,
   focusId,
+  expandedAncestors,
+  toggleAncestor,
+  isFocused,
 }: {
   person: EnrichedPerson;
   expanded: Set<string>;
   toggle: (id: string) => void;
   registerRef: (id: string, el: HTMLDivElement | null) => void;
   focusId?: string | null;
+  expandedAncestors: Set<string>;
+  toggleAncestor: (id: string) => void;
+  isFocused: boolean;
 }) {
   const spouse = person.spouses[0] ? getPersonById(person.spouses[0]) : undefined;
   const allChildIds = unitChildren(person);
@@ -201,17 +207,40 @@ function TreeUnit({
 
   const hasChildren = childIds.length > 0;
   const isExpanded = expanded.has(person.id);
+  const parentIds = person.parents;
+  const hasParents = parentIds.length > 0;
+  const isAncestorExpanded = expandedAncestors.has(person.id);
 
   return (
     <div className="flex flex-col items-center">
       <div className="flex items-center gap-3">
-        <TreeCard
-          person={person}
-          ref={(el) => registerRef(person.id, el)}
-          expanded={isExpanded}
-          hasChildren={hasChildren}
-          onToggle={() => toggle(person.id)}
-        />
+        <div className="relative">
+          <TreeCard
+            person={person}
+            ref={(el) => registerRef(person.id, el)}
+            expanded={isExpanded}
+            hasChildren={hasChildren}
+            onToggle={() => toggle(person.id)}
+          />
+          {hasParents && !isAncestorExpanded && (
+            <button
+              onClick={() => toggleAncestor(person.id)}
+              className="absolute -top-2 -right-2 h-5 w-5 rounded-full bg-primary text-xs font-semibold text-background hover:bg-primary/80 transition-colors"
+              title="Show parents"
+            >
+              +
+            </button>
+          )}
+          {isAncestorExpanded && (
+            <button
+              onClick={() => toggleAncestor(person.id)}
+              className="absolute -top-2 -right-2 h-5 w-5 rounded-full bg-accent text-xs font-semibold text-background hover:bg-accent/80 transition-colors"
+              title="Hide parents"
+            >
+              −
+            </button>
+          )}
+        </div>
         {spouse ? (
           <>
             <span className="h-px w-6 bg-gradient-to-r from-primary to-accent" />
@@ -237,7 +266,32 @@ function TreeUnit({
                 toggle={toggle}
                 registerRef={registerRef}
                 focusId={focusId}
+                expandedAncestors={expandedAncestors}
+                toggleAncestor={toggleAncestor}
+                isFocused={id === focusId}
               />
+            ) : null;
+          })}
+        </div>
+      ) : null}
+      {isAncestorExpanded && hasParents ? (
+        <div className="flex flex-col items-center pt-16">
+          {parentIds.map((parentId) => {
+            const parent = getPersonById(parentId);
+            return parent ? (
+              <div key={parentId} className="flex flex-col items-center gap-8">
+                <span className="h-12 w-px bg-gradient-to-b from-primary to-accent" />
+                <TreeUnit
+                  person={parent}
+                  expanded={expanded}
+                  toggle={toggle}
+                  registerRef={registerRef}
+                  focusId={undefined}
+                  expandedAncestors={expandedAncestors}
+                  toggleAncestor={toggleAncestor}
+                  isFocused={false}
+                />
+              </div>
             ) : null;
           })}
         </div>
@@ -253,26 +307,31 @@ export function FamilyTree() {
 
   const [expanded, setExpanded] = useState<Set<string>>(
     () => {
-      // When focusing on a specific person, start with no expanded roots.
-      // Only expand the focused person's direct lineage, keeping everything
-      // else collapsed. When not focused, show all roots expanded.
-      if (focusId) return new Set();
-      return new Set(roots.map((r) => r.id));
+      // When not focused, show all roots expanded
+      if (!focusId) return new Set(roots.map((r) => r.id));
+      return new Set();
     },
   );
+  const [expandedAncestors, setExpandedAncestors] = useState<Set<string>>(new Set());
   const scrollRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const nodeRefs = useRef(new Map<string, HTMLDivElement>());
   const [links, setLinks] = useState<LinkPath[]>([]);
 
-  // Search hand-off: `?focus=<personId>` expands every ancestor of
-  // that person so their card is mounted, then scrolls to and briefly
-  // highlights it. Unknown/absent `focus` leaves everything as-is.
   const focusHandledRef = useRef<string | null>(null);
   const activeHighlightRef = useRef<{ el: HTMLDivElement; timer: ReturnType<typeof setTimeout> } | null>(null);
 
   const toggle = useCallback((id: string) => {
     setExpanded((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }, []);
+
+  const toggleAncestor = useCallback((id: string) => {
+    setExpandedAncestors((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
       else next.add(id);
@@ -328,34 +387,14 @@ export function FamilyTree() {
     };
   }, [recompute]);
 
-  // Expand the ancestor chain of the focused person, but only show the
-  // direct parent. Grandparents and above are mounted (required for rendering)
-  // but auto-collapsed, keeping the view focused on the search result.
+  // When focus changes, reset ancestor expansion to show only direct parent initially
   useEffect(() => {
-    if (!focusId) return;
-    if (!getPersonById(focusId)) return;
-    const ancestorIds = collectAncestorIds(focusId);
-    if (ancestorIds.size === 0) return;
-    const directParents = getDirectParentIds(focusId);
-    setExpanded((prev) => {
-      const next = new Set(prev);
-      for (const id of ancestorIds) {
-        if (directParents.has(id)) {
-          next.add(id);
-        } else {
-          next.delete(id);
-        }
-      }
-      return next;
-    });
+    if (!focusId) {
+      setExpandedAncestors(new Set());
+    }
   }, [focusId]);
 
-  // Once the focused person's card is mounted (its ref registered by the
-  // expand above), scroll it into view and briefly highlight it. The
-  // highlight is applied imperatively (not via state) so that a large
-  // expansion doesn't force a full tree re-render in the same tick as
-  // scrollIntoView - that re-render was racing the smooth-scroll animation
-  // and silently cancelling it for deep expansions with many mounted cards.
+  // Scroll to and highlight the focused person
   useEffect(() => {
     if (!focusId || focusHandledRef.current === focusId) return;
     const el = nodeRefs.current.get(focusId);
@@ -373,7 +412,7 @@ export function FamilyTree() {
       activeHighlightRef.current = null;
     }, 4000);
     activeHighlightRef.current = { el, timer };
-  }, [focusId, expanded]);
+  }, [focusId]);
 
   useEffect(() => {
     const el = scrollRef.current;
@@ -501,16 +540,61 @@ export function FamilyTree() {
           ))}
         </svg>
 
-        {roots.map((root) => (
-          <TreeUnit
-            key={root.id}
-            person={root}
-            expanded={expanded}
-            toggle={toggle}
-            registerRef={registerRef}
-            focusId={focusId}
-          />
-        ))}
+        {focusId ? (
+          // Focused view: show only the focused person and their direct parent
+          (() => {
+            const focusedPerson = getPersonById(focusId);
+            if (!focusedPerson) return null;
+            const parentIds = focusedPerson.parents;
+            return (
+              <div className="flex flex-col items-center gap-16">
+                <TreeUnit
+                  person={focusedPerson}
+                  expanded={expanded}
+                  toggle={toggle}
+                  registerRef={registerRef}
+                  focusId={undefined}
+                  expandedAncestors={expandedAncestors}
+                  toggleAncestor={toggleAncestor}
+                  isFocused={true}
+                />
+                {parentIds.map((parentId) => {
+                  const parent = getPersonById(parentId);
+                  if (!parent) return null;
+                  return (
+                    <div key={parentId} className="flex flex-col items-center gap-8">
+                      <span className="h-12 w-px bg-gradient-to-b from-primary to-accent" />
+                      <TreeUnit
+                        person={parent}
+                        expanded={expanded}
+                        toggle={toggle}
+                        registerRef={registerRef}
+                        focusId={undefined}
+                        expandedAncestors={expandedAncestors}
+                        toggleAncestor={toggleAncestor}
+                        isFocused={parentId === focusedPerson.parents[0]}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })()
+        ) : (
+          roots.map((root) => (
+            <TreeUnit
+              key={root.id}
+              person={root}
+              expanded={expanded}
+              toggle={toggle}
+              registerRef={registerRef}
+              focusId={undefined}
+              expandedAncestors={expandedAncestors}
+              toggleAncestor={toggleAncestor}
+              isFocused={false}
+            />
+          ))
+        )}
       </div>
     </div>
   );
