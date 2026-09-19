@@ -261,12 +261,13 @@ export function FamilyTree() {
   const [links, setLinks] = useState<LinkPath[]>([]);
 
   // Search hand-off: `?focus=<personId>` expands every ancestor of
-  // that person so their card is mounted, then scrolls to and briefly
-  // highlights it. Unknown/absent `focus` leaves everything as-is.
+  // that person so their card is mounted, then scrolls to and highlights it.
+  // The highlight persists until another non-ancestor node is clicked.
+  // Unknown/absent `focus` leaves everything as-is.
   const searchParams = useSearchParams();
   const focusId = searchParams.get("focus");
   const focusHandledRef = useRef<string | null>(null);
-  const activeHighlightRef = useRef<{ els: HTMLDivElement[]; timers: ReturnType<typeof setTimeout>[] } | null>(null);
+  const activeHighlightRef = useRef<{ els: HTMLDivElement[] } | null>(null);
 
   const toggle = useCallback((id: string) => {
     setExpanded((prev) => {
@@ -400,8 +401,9 @@ export function FamilyTree() {
   }, [focusId]);
 
   // Once the focused person's card is mounted (its ref registered by the
-  // expand above), scroll it into view and briefly highlight it along with
-  // all ancestors. The highlight is applied imperatively (not via state) so
+  // expand above), scroll it into view and highlight it along with all
+  // ancestors. The highlight persists until another non-ancestor node is
+  // clicked. The highlight is applied imperatively (not via state) so
   // that a large expansion doesn't force a full tree re-render in the same
   // tick as scrollIntoView - that re-render was racing the smooth-scroll
   // animation and silently cancelling it for deep expansions with many mounted cards.
@@ -420,9 +422,6 @@ export function FamilyTree() {
     }
 
     if (activeHighlightRef.current) {
-      for (const timer of activeHighlightRef.current.timers) {
-        clearTimeout(timer);
-      }
       for (const highlightEl of activeHighlightRef.current.els) {
         highlightEl.classList.remove("glow-accent", "ring-2", "ring-accent", "highlight-pulse");
       }
@@ -432,13 +431,7 @@ export function FamilyTree() {
       highlightEl.classList.add("glow-accent", "ring-2", "ring-accent", "highlight-pulse");
     }
 
-    const timer = setTimeout(() => {
-      for (const highlightEl of elsToHighlight) {
-        highlightEl.classList.remove("glow-accent", "ring-2", "ring-accent", "highlight-pulse");
-      }
-      activeHighlightRef.current = null;
-    }, 4000);
-    activeHighlightRef.current = { els: elsToHighlight, timers: [timer] };
+    activeHighlightRef.current = { els: elsToHighlight };
   }, [focusId, expanded]);
 
   const focusedNodeAncestors = useMemo(() => {
