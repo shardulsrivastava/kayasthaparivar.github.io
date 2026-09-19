@@ -275,14 +275,19 @@ export function FamilyTree() {
     const edges: { parent: string; child: string }[] = [];
     for (const root of roots) collectVisibleEdges(root, expanded, edges, nodeRefs.current);
 
+    const seenEdges = new Set<string>();
     const paths: LinkPath[] = [];
     for (const edge of edges) {
+      const edgeKey = `${edge.parent}->${edge.child}`;
+      if (seenEdges.has(edgeKey)) continue;
+      seenEdges.add(edgeKey);
+
       const start = unitAnchor(edge.parent, positions);
       const end = unitAnchor(edge.child, positions);
       if (!start || !end) continue;
       const midY = (start.bottom + end.top) / 2;
       paths.push({
-        id: `${edge.parent}->${edge.child}`,
+        id: edgeKey,
         d: `M ${start.x} ${start.bottom} L ${start.x} ${midY} L ${end.x} ${midY} L ${end.x} ${end.top}`,
       });
     }
