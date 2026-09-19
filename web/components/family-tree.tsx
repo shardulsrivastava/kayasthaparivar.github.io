@@ -93,33 +93,47 @@ function TreeCard({
   expanded,
   hasChildren,
   onToggle,
+  onFocus,
 }: {
   person: EnrichedPerson;
   ref?: React.Ref<HTMLDivElement>;
   expanded: boolean;
   hasChildren: boolean;
   onToggle: () => void;
+  onFocus?: () => void;
 }) {
+  const handleClick = (e: React.MouseEvent) => {
+    if (hasChildren) {
+      onToggle();
+    } else if (onFocus) {
+      onFocus();
+    }
+  };
+
   return (
     <Card
       ref={ref}
       size="sm"
-      role={hasChildren ? "button" : undefined}
-      tabIndex={hasChildren ? 0 : undefined}
-      onClick={hasChildren ? onToggle : undefined}
+      role={hasChildren || onFocus ? "button" : undefined}
+      tabIndex={hasChildren || onFocus ? 0 : undefined}
+      onClick={handleClick}
       onKeyDown={
-        hasChildren
+        hasChildren || onFocus
           ? (e) => {
               if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
-                onToggle();
+                if (hasChildren) {
+                  onToggle();
+                } else if (onFocus) {
+                  onFocus();
+                }
               }
             }
           : undefined
       }
       className={cn(
         "glass-panel relative w-40 items-center gap-2 border-0 py-3 text-center transition-all duration-300",
-        hasChildren && "cursor-pointer hover:-translate-y-1 hover:glow-primary",
+        (hasChildren || onFocus) && "cursor-pointer hover:-translate-y-1 hover:glow-primary",
       )}
     >
       <Link
@@ -171,16 +185,24 @@ function TreeUnit({
   expanded,
   toggle,
   registerRef,
+  focusedNodeAncestors,
 }: {
   person: EnrichedPerson;
   expanded: Set<string>;
   toggle: (id: string) => void;
   registerRef: (id: string, el: HTMLDivElement | null) => void;
+  focusedNodeAncestors: Set<string>;
 }) {
   const spouse = person.spouses[0] ? getPersonById(person.spouses[0]) : undefined;
   const childIds = unitChildren(person);
   const hasChildren = childIds.length > 0;
   const isExpanded = expanded.has(person.id);
+
+  const handleFocus = (id: string) => {
+    const newUrl = new URL(window.location.href);
+    newUrl.searchParams.set("focus", id);
+    window.history.replaceState({}, "", newUrl);
+  };
 
   return (
     <div className="flex flex-col items-center">
@@ -191,6 +213,7 @@ function TreeUnit({
           expanded={isExpanded}
           hasChildren={hasChildren}
           onToggle={() => toggle(person.id)}
+          onFocus={focusedNodeAncestors.has(person.id) ? () => handleFocus(person.id) : undefined}
         />
         {spouse ? (
           <>
@@ -201,6 +224,7 @@ function TreeUnit({
               expanded={isExpanded}
               hasChildren={hasChildren}
               onToggle={() => toggle(person.id)}
+              onFocus={focusedNodeAncestors.has(spouse.id) ? () => handleFocus(spouse.id) : undefined}
             />
           </>
         ) : null}
@@ -216,6 +240,7 @@ function TreeUnit({
                 expanded={expanded}
                 toggle={toggle}
                 registerRef={registerRef}
+                focusedNodeAncestors={focusedNodeAncestors}
               />
             ) : null;
           })}
@@ -236,21 +261,40 @@ export function FamilyTree() {
   const [links, setLinks] = useState<LinkPath[]>([]);
 
   // Search hand-off: `?focus=<personId>` expands every ancestor of
-  // that person so their card is mounted, then scrolls to and briefly
-  // highlights it. Unknown/absent `focus` leaves everything as-is.
+  // that person so their card is mounted, then scrolls to and highlights it.
+  // The highlight persists until another non-ancestor node is clicked.
+  // Unknown/absent `focus` leaves everything as-is.
   const searchParams = useSearchParams();
   const focusId = searchParams.get("focus");
   const focusHandledRef = useRef<string | null>(null);
-  const activeHighlightRef = useRef<{ el: HTMLDivElement; timer: ReturnType<typeof setTimeout> } | null>(null);
+  const activeHighlightRef = useRef<{ els: HTMLDivElement[] } | null>(null);
 
   const toggle = useCallback((id: string) => {
     setExpanded((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
+      const isCollapsing = next.has(id);
+
+      if (isCollapsing) {
+        next.delete(id);
+        // If collapsing the focused node or an ancestor of it, focus on parent instead
+        if (focusId) {
+          const focusAncestors = collectAncestorIds(focusId);
+          if (id === focusId || focusAncestors.has(id)) {
+            const person = getPersonById(id);
+            if (person && person.parents.length > 0) {
+              const parentId = person.parents[0];
+              const newUrl = new URL(window.location.href);
+              newUrl.searchParams.set("focus", parentId);
+              window.history.replaceState({}, "", newUrl);
+            }
+          }
+        }
+      } else {
+        next.add(id);
+      }
       return next;
     });
-  }, []);
+  }, [focusId]);
 
   const registerRef = useCallback((id: string, el: HTMLDivElement | null) => {
     if (el) nodeRefs.current.set(id, el);
@@ -357,11 +401,12 @@ export function FamilyTree() {
   }, [focusId]);
 
   // Once the focused person's card is mounted (its ref registered by the
-  // expand above), scroll it into view and briefly highlight it. The
-  // highlight is applied imperatively (not via state) so that a large
-  // expansion doesn't force a full tree re-render in the same tick as
-  // scrollIntoView - that re-render was racing the smooth-scroll animation
-  // and silently cancelling it for deep expansions with many mounted cards.
+  // expand above), scroll it into view and highlight it along with all
+  // ancestors. The highlight persists until another non-ancestor node is
+  // clicked. The highlight is applied imperatively (not via state) so
+  // that a large expansion doesn't force a full tree re-render in the same
+  // tick as scrollIntoView - that re-render was racing the smooth-scroll
+  // animation and silently cancelling it for deep expansions with many mounted cards.
   useEffect(() => {
     if (!focusId || focusHandledRef.current === focusId) return;
     const el = nodeRefs.current.get(focusId);
@@ -369,17 +414,32 @@ export function FamilyTree() {
     focusHandledRef.current = focusId;
     el.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
 
-    if (activeHighlightRef.current) {
-      clearTimeout(activeHighlightRef.current.timer);
-      activeHighlightRef.current.el.classList.remove("glow-accent", "ring-2", "ring-accent", "highlight-pulse");
+    const ancestorIds = collectAncestorIds(focusId);
+    const elsToHighlight = [el];
+    for (const ancestorId of ancestorIds) {
+      const ancestorEl = nodeRefs.current.get(ancestorId);
+      if (ancestorEl) elsToHighlight.push(ancestorEl);
     }
-    el.classList.add("glow-accent", "ring-2", "ring-accent", "highlight-pulse");
-    const timer = setTimeout(() => {
-      el.classList.remove("glow-accent", "ring-2", "ring-accent", "highlight-pulse");
-      activeHighlightRef.current = null;
-    }, 4000);
-    activeHighlightRef.current = { el, timer };
+
+    if (activeHighlightRef.current) {
+      for (const highlightEl of activeHighlightRef.current.els) {
+        highlightEl.classList.remove("glow-accent", "ring-2", "ring-accent", "highlight-pulse");
+      }
+    }
+
+    for (const highlightEl of elsToHighlight) {
+      highlightEl.classList.add("glow-accent", "ring-2", "ring-accent", "highlight-pulse");
+    }
+
+    activeHighlightRef.current = { els: elsToHighlight };
   }, [focusId, expanded]);
+
+  const focusedNodeAncestors = useMemo(() => {
+    if (!focusId) return new Set<string>();
+    const ancestors = collectAncestorIds(focusId);
+    ancestors.add(focusId);
+    return ancestors;
+  }, [focusId]);
 
   useEffect(() => {
     const el = scrollRef.current;
@@ -514,6 +574,7 @@ export function FamilyTree() {
             expanded={expanded}
             toggle={toggle}
             registerRef={registerRef}
+            focusedNodeAncestors={focusedNodeAncestors}
           />
         ))}
       </div>
