@@ -36,12 +36,15 @@ function collectVisibleEdges(
   person: EnrichedPerson,
   expanded: Set<string>,
   edges: { parent: string; child: string }[],
+  nodeRefs: Map<string, HTMLDivElement>,
 ) {
   if (!expanded.has(person.id)) return;
+  if (!nodeRefs.has(person.id)) return;
   for (const childId of unitChildren(person)) {
+    if (!nodeRefs.has(childId)) continue;
     edges.push({ parent: person.id, child: childId });
     const child = getPersonById(childId);
-    if (child) collectVisibleEdges(child, expanded, edges);
+    if (child) collectVisibleEdges(child, expanded, edges, nodeRefs);
   }
 }
 
@@ -270,19 +273,55 @@ export function FamilyTree() {
     });
 
     const edges: { parent: string; child: string }[] = [];
-    for (const root of roots) collectVisibleEdges(root, expanded, edges);
+    for (const root of roots) collectVisibleEdges(root, expanded, edges, nodeRefs.current);
+
+    const edgesByParent = new Map<string, string[]>();
+    for (const edge of edges) {
+      if (!edgesByParent.has(edge.parent)) {
+        edgesByParent.set(edge.parent, []);
+      }
+      edgesByParent.get(edge.parent)!.push(edge.child);
+    }
 
     const paths: LinkPath[] = [];
-    for (const edge of edges) {
-      const start = unitAnchor(edge.parent, positions);
-      const end = unitAnchor(edge.child, positions);
-      if (!start || !end) continue;
-      const midY = (start.bottom + end.top) / 2;
+
+    for (const [parentId, childIds] of edgesByParent) {
+      const parentPos = unitAnchor(parentId, positions);
+      if (!parentPos) continue;
+
+      const childPositions = childIds
+        .map(childId => {
+          const pos = unitAnchor(childId, positions);
+          return pos ? { childId, pos } : null;
+        })
+        .filter((item): item is { childId: string; pos: NodeRect } => item !== null);
+
+      if (childPositions.length === 0) continue;
+
+      const childTops = childPositions.map(c => c.pos.top);
+      const childXs = childPositions.map(c => c.pos.x);
+      const midY = (parentPos.bottom + Math.min(...childTops)) / 2;
+      const minChildX = Math.min(...childXs);
+      const maxChildX = Math.max(...childXs);
+
       paths.push({
-        id: `${edge.parent}->${edge.child}`,
-        d: `M ${start.x} ${start.bottom} L ${start.x} ${midY} L ${end.x} ${midY} L ${end.x} ${end.top}`,
+        id: `${parentId}-v-down`,
+        d: `M ${parentPos.x} ${parentPos.bottom} L ${parentPos.x} ${midY}`,
       });
+
+      paths.push({
+        id: `${parentId}-h-line`,
+        d: `M ${minChildX} ${midY} L ${maxChildX} ${midY}`,
+      });
+
+      for (const { childId, pos } of childPositions) {
+        paths.push({
+          id: `${parentId}-v-${childId}`,
+          d: `M ${pos.x} ${midY} L ${pos.x} ${pos.top}`,
+        });
+      }
     }
+
     setLinks(paths);
   }, [roots, expanded]);
 
