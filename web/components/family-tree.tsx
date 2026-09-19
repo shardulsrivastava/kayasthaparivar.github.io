@@ -272,8 +272,18 @@ export function FamilyTree() {
     const edges: { parent: string; child: string }[] = [];
     for (const root of roots) collectVisibleEdges(root, expanded, edges);
 
-    const paths: LinkPath[] = [];
+    const edgeKeys = new Set<string>();
+    const uniqueEdges: { parent: string; child: string }[] = [];
     for (const edge of edges) {
+      const key = `${edge.parent}->${edge.child}`;
+      if (!edgeKeys.has(key)) {
+        edgeKeys.add(key);
+        uniqueEdges.push(edge);
+      }
+    }
+
+    const paths: LinkPath[] = [];
+    for (const edge of uniqueEdges) {
       const start = unitAnchor(edge.parent, positions);
       const end = unitAnchor(edge.child, positions);
       if (!start || !end) continue;
