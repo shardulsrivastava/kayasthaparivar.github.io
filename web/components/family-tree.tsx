@@ -36,12 +36,15 @@ function collectVisibleEdges(
   person: EnrichedPerson,
   expanded: Set<string>,
   edges: { parent: string; child: string }[],
+  nodeRefs: Map<string, HTMLDivElement>,
 ) {
   if (!expanded.has(person.id)) return;
+  if (!nodeRefs.has(person.id)) return;
   for (const childId of unitChildren(person)) {
+    if (!nodeRefs.has(childId)) continue;
     edges.push({ parent: person.id, child: childId });
     const child = getPersonById(childId);
-    if (child) collectVisibleEdges(child, expanded, edges);
+    if (child) collectVisibleEdges(child, expanded, edges, nodeRefs);
   }
 }
 
@@ -270,20 +273,10 @@ export function FamilyTree() {
     });
 
     const edges: { parent: string; child: string }[] = [];
-    for (const root of roots) collectVisibleEdges(root, expanded, edges);
-
-    const edgeKeys = new Set<string>();
-    const uniqueEdges: { parent: string; child: string }[] = [];
-    for (const edge of edges) {
-      const key = `${edge.parent}->${edge.child}`;
-      if (!edgeKeys.has(key)) {
-        edgeKeys.add(key);
-        uniqueEdges.push(edge);
-      }
-    }
+    for (const root of roots) collectVisibleEdges(root, expanded, edges, nodeRefs.current);
 
     const paths: LinkPath[] = [];
-    for (const edge of uniqueEdges) {
+    for (const edge of edges) {
       const start = unitAnchor(edge.parent, positions);
       const end = unitAnchor(edge.child, positions);
       if (!start || !end) continue;
