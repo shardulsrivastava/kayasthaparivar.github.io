@@ -14,10 +14,12 @@
     "start": "next start",
     "lint": "eslint",
     "generate-data": "node scripts/build-family-data.mjs",
-    "watch-data": "node --watch --watch-path=data/family.yaml scripts/build-family-data.mjs"
+    "watch-data": "node --watch --watch-path=data/family.yaml scripts/build-family-data.mjs",
+    "check-panchang": "node scripts/check-panchang.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",
+    "astronomy-engine": "^2.1.19",
     "class-variance-authority": "^0.7.1",
     "cmdk": "^1.1.1",
     "cn": "^0.2.5",

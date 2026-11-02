@@ -11,6 +11,9 @@ export function SiteHeader() {
           <Link href="/" className="transition-colors hover:text-foreground">
             Home
           </Link>
+          <Link href="/calendar" className="transition-colors hover:text-foreground">
+            Calendar
+          </Link>
         </nav>
       </div>
     </header>
