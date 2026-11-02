@@ -111,7 +111,7 @@ function MonthView({ today }: { today: Today }) {
             >
               {p.day}
             </span>
-            <span className="text-[11px] leading-tight text-foreground/80 sm:text-sm sm:font-medium">
+            <span className="text-[11px] leading-tight text-foreground/80 sm:text-xs">
               <span className="hidden sm:inline">{tithiLabel(p)}</span>
               <span className="sm:hidden">{p.tithi}</span>
             </span>
