@@ -14,6 +14,9 @@ export function SiteHeader() {
           <Link href="/calendar" className="transition-colors hover:text-foreground">
             Calendar
           </Link>
+          <Link href="/calendar-2" className="transition-colors hover:text-foreground">
+            Calendar 2
+          </Link>
         </nav>
       </div>
     </header>
