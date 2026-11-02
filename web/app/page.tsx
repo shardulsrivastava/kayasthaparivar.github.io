@@ -2,7 +2,6 @@ import { Suspense } from "react";
 import { SiteHeader } from "@/components/site-header";
 import { SearchBar } from "@/components/search-bar";
 import { FamilyTree } from "@/components/family-tree";
-import { HinduCalendarCard } from "@/components/hindu-calendar-card";
 import { getAllPeople, getGenerations } from "@/lib/family";
 
 export default function Home() {
@@ -36,7 +35,7 @@ export default function Home() {
             that make up our family — from Barabanki and beyond.
           </p>
 
-          <section className="mx-auto mt-10 grid max-w-3xl grid-cols-2 gap-4 px-6 sm:grid-cols-4">
+          <section className="mx-auto mt-10 grid max-w-3xl grid-cols-3 gap-4 px-6">
             {stats.map((stat) => (
               <div
                 key={stat.label}
@@ -50,7 +49,6 @@ export default function Home() {
                 </p>
               </div>
             ))}
-            <HinduCalendarCard />
           </section>
 
           <div className="mx-auto mt-10 max-w-xl">

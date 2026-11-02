@@ -42,7 +42,6 @@ const FESTIVALS: [key: string, name: string, at: Observance][] = [
   ["Kartik-Shukla-11", "Dev Uthani Ekadashi", "sunrise"],
   ["Kartik-Shukla-15", "Kartik Purnima", "sunrise"],
 ];
-const FESTIVAL_NAMES = new Set(FESTIVALS.map(([, name]) => name));
 
 export type Paksha = "Shukla" | "Krishna";
 
@@ -141,15 +140,6 @@ export function getPanchang(year: number, month0: number, day: number): Panchang
 export function getMonth(year: number, month0: number): Panchang[] {
   const days = new Date(Date.UTC(year, month0 + 1, 0)).getUTCDate();
   return Array.from({ length: days }, (_, i) => getPanchang(year, month0, i + 1));
-}
-
-export function nextFestival(year: number, month0: number, day: number, limitDays = 90) {
-  for (let i = 1; i <= limitDays; i++) {
-    const date = new Date(Date.UTC(year, month0, day + i));
-    const p = getPanchang(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
-    if (p.festival && FESTIVAL_NAMES.has(p.festival)) return { date, name: p.festival };
-  }
-  return null;
 }
 
 export function todayInIndia() {
